@@ -46,7 +46,7 @@ movies.select { |m| m[:genres].include?('Comedy') }.sort_by { |i| i[:release_at]
 end
 
 puts "\n# List of all directors alphabetically (no repetition!)"
-puts movies.map { |m| m[:director] }.uniq.sort_by { |e| e.split.last }
+puts(movies.map { |m| m[:director] }.uniq.sort_by { |e| e.split.last })
 
 puts "\n# Number of films shot not in the USA"
 puts movies.reject { |m| m[:country].include?('USA') }.count

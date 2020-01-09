@@ -1,4 +1,12 @@
-GOOD_MOVIES = ['Matrix'].freeze
+file_name = ARGV.first || 'movies.txt'
+file = File.open file_name
 
-movie = ARGV.first
-puts GOOD_MOVIES.include?(movie) ? "#{movie} is a good movie" : "#{movie} is a bad movie"
+file.each do |line|
+  arr = line.split('|')
+  title = arr[1]
+
+  if title.include? 'Max'
+    stars = ('*' * ((arr[7].to_f * 10).to_i - 80))
+    puts "Title: #{title}, Rate: #{stars}"
+  end
+end

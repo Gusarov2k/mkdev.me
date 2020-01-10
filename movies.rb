@@ -1,7 +1,25 @@
 require 'date'
+require 'csv'
+require 'ostruct'
+require 'pry'
+
+MONTH = {
+  1 => 'January',
+  2 => 'February',
+  3 => 'March',
+  4 => 'April',
+  5 => 'May',
+  6 => 'June',
+  7 => 'July',
+  8 => 'August',
+  9 => 'September',
+  10 => 'October',
+  11 => 'November',
+  12 => 'December'
+}.freeze
 
 file_name = ARGV.first || 'movies.txt'
-file = File.open file_name
+csv = CSV.read(file_name, col_sep: '|')
 
 def date_safe_parse(str)
   patern = case str
@@ -12,9 +30,8 @@ def date_safe_parse(str)
   Date.strptime(str, patern)
 end
 
-movies = file.map do |line|
-  arr = line.split('|')
-  {
+movies = csv.map do |arr|
+  OpenStruct.new(
     imdb_link: arr[0],
     title: arr[1],
     year: arr[2].to_i,
@@ -25,7 +42,7 @@ movies = file.map do |line|
     rate: arr[7],
     director: arr[8],
     star_actors: arr[9].split(',')
-  }
+  )
 end
 
 def movie_format(obj)
@@ -46,3 +63,6 @@ puts(movies.map { |m| m[:director] }.uniq.sort_by { |e| e.split.last })
 
 puts "\n# Number of films shot not in the USA"
 puts movies.reject { |m| m[:country].include?('USA') }.count
+
+puts "\n# Movies count by month"
+movies.group_by { |m| m[:release_at].mon }.sort.map { |k, v| puts "#{MONTH[k]}: #{v.count}" }

@@ -1,7 +1,6 @@
 require 'date'
 require 'csv'
 require 'ostruct'
-require 'pry'
 
 MONTH = {
   1 => 'January',

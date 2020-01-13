@@ -8,12 +8,8 @@ class Movie
     params.each { |key, value| instance_variable_set("@#{key}", value) }
   end
 
-  def pretty_print
-    "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
-  end
-
   def to_s
-    pretty_print
+    "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
   end
 
   def has_genre?(attr)
@@ -21,5 +17,14 @@ class Movie
     raise err_msg unless movie_collection.existing_genres.include?(attr)
 
     genre.include?(attr)
+  end
+
+  def matches?(field, pattern)
+    value = send(field)
+    value.is_a?(Array) ? value.any?(pattern) : pattern === value
+  end
+
+  def month
+    Date::MONTHNAMES[release_at.mon]
   end
 end

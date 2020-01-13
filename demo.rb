@@ -3,7 +3,6 @@ require 'csv'
 require 'ostruct'
 require './movie_collection.rb'
 require './movie.rb'
-require 'pry'
 
 file_name = ARGV.first || 'movies.txt'
 movies = MovieCollection.new(file_name)

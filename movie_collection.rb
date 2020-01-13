@@ -40,12 +40,11 @@ class MovieCollection
   end
 
   def stats(arg)
-    arr = @movies.flat_map { |m| m.send(arg) }.uniq
-    arr.map { |a| { a => @movies.select { |m| m.matches?(arg, a) }.count } }
+    @movies.flat_map(&arg).group_by { |e| e }.map { |k, v| { k => v.count } }
   end
 
   def existing_genres
-    @existing_genres ||= @movies.map(&:genre).flatten.sort.uniq
+    @existing_genres ||= @movies.flat_map(&:genre).sort.uniq
   end
 
   def self.date_safe_parse(str)

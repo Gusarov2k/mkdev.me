@@ -1,14 +1,15 @@
 class Movie
-  HEADERS = %w[imdb_link title year country release_at genre duration rate director star_actors].freeze
-  attr_accessor(*HEADERS.map(&:to_sym))
+  HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
+  attr_reader(*HEADERS)
   attr_reader :movie_collection
 
-  def initialize(params)
+  def initialize(movie_collection, **params)
+    @movie_collection = movie_collection
     params.each { |key, value| instance_variable_set("@#{key}", value) }
   end
 
   def pretty_print
-    puts "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
+    "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
   end
 
   def to_s

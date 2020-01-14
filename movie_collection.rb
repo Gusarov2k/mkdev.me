@@ -40,7 +40,7 @@ class MovieCollection
   end
 
   def stats(arg)
-    @movies.flat_map(&arg).group_by(&:itself).map { |k, v| [k, v.count] }.to_h
+    @movies.flat_map(&arg).group_by(&:itself).to_h { |k, v| [k, v.count] }
   end
 
   def existing_genres

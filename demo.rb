@@ -1,8 +1,7 @@
 require 'date'
 require 'csv'
 require 'ostruct'
-require './movie_collection.rb'
-require './movie.rb'
+Dir['./lib/*.rb'].sort.each { |file| require file }
 
 file_name = ARGV.first || 'movies.txt'
 movies = MovieCollection.new(file_name)

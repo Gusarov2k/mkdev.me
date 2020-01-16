@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'bundler/setup'
 Bundler.require(:default, :test, :development)
-require './lib/movie.rb'
-# Dir['./lib/*.rb'].sort.each { |file| require file }
+require 'csv'
+Dir['./lib/*.rb'].sort.each { |file| require file }
 
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods

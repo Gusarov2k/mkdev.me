@@ -3,7 +3,7 @@ RSpec.describe Movie do
   let(:movie_collection) { double }
   let(:existing_genres)  { %w[Crime Drama Action] }
   let(:params)           { attributes_for(:movie) }
-  let(:movie)            { Movie.new(*input) }
+  let(:movie)            { described_class.new(*input) }
 
   before do
     allow(movie_collection).to receive(:file_name).and_return('movies.txt')
@@ -11,11 +11,11 @@ RSpec.describe Movie do
   end
 
   describe '#new' do
-    subject { Movie.new(*input) }
+    subject { described_class.new(*input) }
 
     context 'when all good' do
-      its(:itself) { should be_an_instance_of(Movie) }
-      its(:movie_collection) { is_expected.to eq movie_collection }
+      its(:itself) { should be_an_instance_of(described_class) }
+      its(:movie_collection) { should eq movie_collection }
       it 'creates movie instance with methods from all valid params' do
         params.each do |key, value|
           expect(movie.send(key)).to eq value

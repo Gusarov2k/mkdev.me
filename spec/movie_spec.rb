@@ -23,7 +23,7 @@ RSpec.describe Movie do
     allow(movie_collection).to receive(:existing_genres).and_return(existing_genres)
   end
 
-  describe '#new' do
+  describe '.new' do
     subject { described_class.new(*input) }
 
     context 'when all good' do

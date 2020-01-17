@@ -12,4 +12,5 @@ group :development, :test do
   gem 'rspec', '~>3.9'
   gem 'rspec-its'
   gem 'rubocop'
+  gem 'rubocop-rspec', require: false
 end

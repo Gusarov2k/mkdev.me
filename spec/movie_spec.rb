@@ -116,6 +116,10 @@ RSpec.describe Movie do
       it 'matches the DateTime object' do
         expect(movie.matches?(:release_at, DateTime.new(1994, 10, 14, 23, 1, 58))).to be(true)
       end
+
+      it 'matches the Data range' do
+        expect(movie.matches?(:release_at, (Date.new(1994, 10, 10)..Date.new(1994, 10, 20)))).to be(true)
+      end
     end
 
     context 'when field is an Integer' do

@@ -134,21 +134,19 @@ RSpec.describe MovieCollection do
       subject(:stats) { movie_collection.stats(:director) }
 
       it 'returns the hash with directors and his movis count' do
-        expect(stats).to eq do
-          {
-            'Frank Darabont' => 1,
-            'Francis Ford Coppola' => 2,
-            'Christopher Nolan' => 1,
-            'Sidney Lumet' => 1
-          }
-        end
+        expect(stats).to eq(
+          'Frank Darabont' => 1,
+          'Francis Ford Coppola' => 2,
+          'Christopher Nolan' => 1,
+          'Sidney Lumet' => 1
+        )
       end
     end
 
     context 'when call with not-existing field' do
       subject { movie_collection.stats(not_existing: 'junk') }
 
-      it { is_expected.to eq [[nil, File.read(file_name).each_line.count]].to_h }
+      it { is_expected.to eq(nil => File.read(file_name).each_line.count) }
     end
   end
 

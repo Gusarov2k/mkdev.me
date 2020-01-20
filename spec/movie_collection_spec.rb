@@ -1,7 +1,11 @@
+RSpec.shared_examples 'movie collection content' do
+  it { is_expected.to be_an_instance_of(Array) }
+  it { is_expected.to all be_an_instance_of(Movie) }
+end
+
 RSpec.describe MovieCollection do
-  let(:file_name)                 { './spec/fixtures/movies.txt' }
-  let!(:movie_collection)         { described_class.new(file_name) }
-  let!(:instance_variable_movies) { movie_collection.instance_variable_get(:@movies) }
+  let(:file_name)        { './spec/fixtures/movies.txt' }
+  let(:movie_collection) { described_class.new(file_name) }
   let(:movie_params) do
     {
       imdb_link: 'http://imdb.com/title/tt0111161/?ref_=chttp_tt_1',
@@ -20,66 +24,72 @@ RSpec.describe MovieCollection do
   describe '.new' do
     subject(:new) { described_class.new(file_name) }
 
-    let(:file_name) { './spec/fixtures/one_line_movies.txt' }
-    let(:movie)     { subject.instance_variable_get(:@movies).first }
-
     context 'when all good' do
+      let(:file_name) { './spec/fixtures/one_line_movies.txt' }
+
       it { is_expected.to be_an_instance_of(described_class) }
       its(:file_name) { is_expected.to eq file_name }
-
-      it 'creates Array of Movie' do
-        expect(new.instance_variable_get(:@movies)).to(be_any { |e| e.is_a?(Movie) })
-      end
-
-      it 'parse txt file and creates valid Movie' do
-        movie_params.each do |key, value|
-          expect(movie.send(key)).to eq value
-        end
-      end
     end
 
-    context 'when wrong number of arguments' do
-      subject { described_class.new }
+    context 'when file not exists' do
+      let(:file_name) { './never_exists_file.txt' }
 
-      its(:itself) { will raise_error(ArgumentError) }
+      it { expect { new }.to raise_error(Errno::ENOENT) }
     end
   end
 
   describe '#all' do
-    subject { movie_collection.all }
+    subject(:movies) { movie_collection.all }
 
-    it { is_expected.to eq instance_variable_movies }
+    context 'when file contens movies' do
+      let(:file_name) { './spec/fixtures/one_line_movies.txt' }
+      let(:movie_params) do
+        {
+          imdb_link: 'http://imdb.com/title/tt0111161/?ref_=chttp_tt_1',
+          title: 'The Shawshank Redemption',
+          year: 1994,
+          country: 'USA',
+          release_at: Date.new(1994, 10, 14),
+          genre: %w[Crime Drama],
+          duration: 142,
+          rate: '9.3',
+          director: 'Frank Darabont',
+          star_actors: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton']
+        }
+      end
+
+      it_behaves_like 'movie collection content'
+      it 'return movie instance with data from file' do
+        movie_params.each do |key, value|
+          expect(movies.first.send(key)).to eq value
+        end
+      end
+    end
+
+    context 'when file is empty' do
+      let(:file_name) { './spec/fixtures/empty_file.txt' }
+
+      it { is_expected.to eq [] }
+    end
   end
 
   describe '#sort_by' do
-    subject(:all) { movie_collection.sort_by(arg) }
-
     context 'when call with symbol' do
-      let(:arg) { :duration }
+      subject(:sorted) { movie_collection.sort_by(:year) }
 
-      it 'calls sort_by for instance_variable @movies with arg converted to Proc' do
-        expect(instance_variable_movies).to receive(:sort_by) do |*_args, &block|
-          expect(arg.to_proc).to eq block
-        end
-        all
+      it_behaves_like 'movie collection content'
+      it 'sorts movies by year' do
+        expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
       end
     end
 
     context 'when call with block' do
-      let(:arg) { proc { 'hi' } }
+      subject(:sorted) { movie_collection.sort_by { |m| m.year.to_s } }
 
-      it 'calls sort_by for instance_variable @movies with given block' do
-        expect(instance_variable_movies).to receive(:sort_by) do |*_args, &block|
-          expect(arg).to eq block
-        end
-        all
+      it_behaves_like 'movie collection content'
+      it 'sorts movies by year like in symbol case' do
+        expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
       end
-    end
-
-    context 'when call with whong argument type' do
-      let(:arg) { 'duration' }
-
-      its(:itself) { will raise_error(TypeError) }
     end
   end
 
@@ -87,49 +97,38 @@ RSpec.describe MovieCollection do
     context 'when call with hash' do
       subject(:list) { movie_collection.select(country: 'USA') }
 
-      it 'calls select for instance_variable @movies and pass hash converted to Proc' do
-        expect(instance_variable_movies).to receive(:select) do |*_args, &block|
-          expect(block).to be_an_instance_of(Proc)
-        end
-        list
+      it_behaves_like 'movie collection content'
+      it 'returns only movies produced in USA' do
+        expect(list.map(&:country).uniq).to eq ['USA']
       end
     end
 
     context 'when call with block' do
-      subject(:list) { movie_collection.select { |m| m.genre.include?('Comedy') } }
+      subject(:list) { movie_collection.select { |m| m.country == 'USA' } }
 
-      it 'calls select for instance_variable @movies and pass given block' do
-        expect(instance_variable_movies).to receive(:select) do |*_args, &block|
-          expect(block).to be_an_instance_of(Proc)
-        end
-        list
+      it_behaves_like 'movie collection content'
+      it 'returns only movies produced in USA like in symbol case' do
+        expect(list.map(&:country).uniq).to eq ['USA']
       end
-    end
-
-    context 'when call with whong argument type' do
-      subject { movie_collection.select('duration') }
-
-      its(:itself) { will raise_error(NoMethodError) }
     end
   end
 
   describe '#filter' do
-    context 'when call with valid arguments' do
-      subject { movie_collection.filter(genre: 'Crime', year: (1993..1995), title: /The Shawshank/i) }
+    context 'when movie with given filters exists' do
+      subject(:list) { movie_collection.filter(genre: 'Crime', year: (1993..1995), title: /The Shawshank/i) }
 
-      let(:movie) { subject.first }
-
+      it_behaves_like 'movie collection content'
       it 'Select The Shawshank Redemption Movie' do
         movie_params.each do |key, value|
-          expect(movie.send(key)).to eq value
+          expect(list.first.send(key)).to eq value
         end
       end
     end
 
-    context 'when call with not-existing field' do
-      subject { movie_collection.filter(not_existing: 'junk') }
+    context 'when movie with given filters not exists' do
+      subject(:list) { movie_collection.filter(year: 21) }
 
-      its(:itself) { will raise_error(NoMethodError) }
+      it { is_expected.to eq [] }
     end
   end
 
@@ -159,8 +158,10 @@ RSpec.describe MovieCollection do
   end
 
   describe '#existing_genres' do
-    subject { movie_collection.existing_genres }
+    subject(:genres) { movie_collection.existing_genres }
 
-    it { is_expected.to eq %w[Action Crime Drama] }
+    it 'returns all genres existing in movie_collection' do
+      expect(genres).to eq %w[Action Crime Drama]
+    end
   end
 end

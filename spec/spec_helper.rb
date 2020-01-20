@@ -2,7 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 Bundler.require(:default, :test, :development)
 require 'csv'
-Dir['./lib/*.rb'].sort.each { |file| require file }
+Dir[File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', '**', '*.rb'))].sort.each { |f| require f }
+Dir[File.expand_path(File.join(File.dirname(__FILE__), 'support', '**', '*.rb'))].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

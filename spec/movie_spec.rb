@@ -30,9 +30,7 @@ RSpec.describe Movie do
       its(:movie_collection) { is_expected.to eq movie_collection }
 
       it 'creates movie instance with methods from all valid params' do
-        params.each do |key, value|
-          expect(movie.send(key)).to eq value
-        end
+        expect(movie).to have_attributes(params)
       end
     end
   end

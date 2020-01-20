@@ -1,8 +1,3 @@
-RSpec.shared_examples 'movie collection content' do
-  it { is_expected.to be_an_instance_of(Array) }
-  it { is_expected.to all be_an_instance_of(Movie) }
-end
-
 RSpec.describe MovieCollection do
   let(:file_name)        { './spec/fixtures/movies.txt' }
   let(:movie_collection) { described_class.new(file_name) }
@@ -58,11 +53,10 @@ RSpec.describe MovieCollection do
         }
       end
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'return movie instance with data from file' do
-        movie_params.each do |key, value|
-          expect(movies.first.send(key)).to eq value
-        end
+        expect(movies.first).to have_attributes(movie_params)
       end
     end
 
@@ -77,7 +71,8 @@ RSpec.describe MovieCollection do
     context 'when call with symbol' do
       subject(:sorted) { movie_collection.sort_by(:year) }
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'sorts movies by year' do
         expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
       end
@@ -86,7 +81,8 @@ RSpec.describe MovieCollection do
     context 'when call with block' do
       subject(:sorted) { movie_collection.sort_by { |m| m.year.to_s } }
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'sorts movies by year like in symbol case' do
         expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
       end
@@ -97,18 +93,20 @@ RSpec.describe MovieCollection do
     context 'when call with hash' do
       subject(:list) { movie_collection.select(country: 'USA') }
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'returns only movies produced in USA' do
-        expect(list.map(&:country).uniq).to eq ['USA']
+        expect(list).to all have_attributes(country: 'USA')
       end
     end
 
     context 'when call with block' do
       subject(:list) { movie_collection.select { |m| m.country == 'USA' } }
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'returns only movies produced in USA like in symbol case' do
-        expect(list.map(&:country).uniq).to eq ['USA']
+        expect(list).to all have_attributes(country: 'USA')
       end
     end
   end
@@ -117,11 +115,10 @@ RSpec.describe MovieCollection do
     context 'when movie with given filters exists' do
       subject(:list) { movie_collection.filter(genre: 'Crime', year: (1993..1995), title: /The Shawshank/i) }
 
-      it_behaves_like 'movie collection content'
+      it { is_expected.to be_a_array_of(Movie) }
+
       it 'Select The Shawshank Redemption Movie' do
-        movie_params.each do |key, value|
-          expect(list.first.send(key)).to eq value
-        end
+        expect(list.first).to have_attributes(movie_params)
       end
     end
 
@@ -134,26 +131,24 @@ RSpec.describe MovieCollection do
 
   describe '#stats' do
     context 'when call with valid arguments' do
-      subject { movie_collection.stats(:director) }
+      subject(:stats) { movie_collection.stats(:director) }
 
-      let(:expected_result) do
-        {
-          'Frank Darabont' => 1,
-          'Francis Ford Coppola' => 2,
-          'Christopher Nolan' => 1,
-          'Sidney Lumet' => 1
-        }
+      it 'returns the hash with directors and his movis count' do
+        expect(stats).to eq do
+          {
+            'Frank Darabont' => 1,
+            'Francis Ford Coppola' => 2,
+            'Christopher Nolan' => 1,
+            'Sidney Lumet' => 1
+          }
+        end
       end
-
-      it { is_expected.to eq expected_result }
     end
 
     context 'when call with not-existing field' do
       subject { movie_collection.stats(not_existing: 'junk') }
 
-      let(:expected_result) { { nil => File.read(file_name).each_line.count } }
-
-      it { is_expected.to eq expected_result }
+      it { is_expected.to eq [[nil, File.read(file_name).each_line.count]].to_h }
     end
   end
 

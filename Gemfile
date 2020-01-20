@@ -7,8 +7,6 @@ group :development do
 end
 
 group :development, :test do
-  gem 'factory_bot'
-  gem 'ffaker'
   gem 'rspec', '~>3.9'
   gem 'rspec-its'
   gem 'rubocop'

@@ -1,6 +1,5 @@
 RSpec.describe Movie do
-  let(:movie)            { described_class.new(*input) }
-  let(:input)            { [movie_collection, params] }
+  let(:movie)            { described_class.new(movie_collection, params) }
   let(:movie_collection) { double }
   let(:existing_genres)  { %w[Crime Drama Action] }
   let(:params) do
@@ -24,7 +23,7 @@ RSpec.describe Movie do
   end
 
   describe '.new' do
-    subject { described_class.new(*input) }
+    subject { described_class.new(movie_collection, params) }
 
     context 'when all good' do
       it { is_expected.to be_an_instance_of(described_class) }
@@ -33,22 +32,6 @@ RSpec.describe Movie do
       it 'creates movie instance with methods from all valid params' do
         params.each do |key, value|
           expect(movie.send(key)).to eq value
-        end
-      end
-    end
-
-    context 'when wrong number of arguments' do
-      let(:input) { nil }
-
-      its(:itself) { will raise_error(ArgumentError) }
-    end
-
-    context 'when invalid keys in params' do
-      let(:params) { { invalid_key: 'some value', other_invalid_key: 'junk' } }
-
-      it 'creates instance without any methods from params' do
-        params.each do |key, _value|
-          expect { movie.send(key) }.to raise_error(NoMethodError)
         end
       end
     end
@@ -61,93 +44,100 @@ RSpec.describe Movie do
   end
 
   describe '#has_genre?' do
-    subject { movie.has_genre?(testing_genre) }
-
-    let(:err_msg) { "There is no genre #{testing_genre} in #{movie_collection.file_name}" }
+    subject(:has_genre) { movie.has_genre?(genre) }
 
     context 'when movie has testing genre' do
-      let(:testing_genre) { 'Drama' }
+      let(:genre) { 'Drama' }
 
       it { is_expected.to be_truthy }
     end
 
     context 'when movie has no testing genre' do
-      let(:testing_genre) { 'Action' }
+      let(:genre) { 'Action' }
 
       it { is_expected.to be_falsey }
     end
 
     context 'when testing genre not present in movie_collection existing_genres' do
-      let(:testing_genre) { 'Opera' }
+      let(:genre) { 'Opera' }
 
-      its(:itself) { will raise_error(RuntimeError, err_msg) }
-    end
-
-    context 'when movie_collection has empty existing_genres' do
-      let(:existing_genres) { nil }
-      let(:testing_genre)   { 'Opera' }
-
-      its(:itself) { will raise_error(NoMethodError) }
+      it 'raise error with right message' do
+        expect { has_genre }.to raise_error(RuntimeError, "There is no genre #{genre} in #{movie_collection.file_name}")
+      end
     end
 
     context 'when testing genre is nil' do
-      let(:testing_genre) { nil }
+      let(:genre) { nil }
 
-      its(:itself) { will raise_error(RuntimeError, err_msg) }
+      it 'raise error with right message' do
+        expect { has_genre }.to raise_error(RuntimeError, "There is no genre #{genre} in #{movie_collection.file_name}")
+      end
     end
   end
 
   describe '#matches?' do
-    subject(:match) { movie.matches?(field, pattern) }
+    context 'when field is a String' do
+      it 'matches the full string' do
+        expect(movie.matches?(:title, 'The Shawshank Redemption')).to be(true)
+      end
 
-    let(:pattern) { double }
+      it 'not matches the part string' do
+        expect(movie.matches?(:title, 'The Shawshank')).to be(false)
+      end
 
-    context 'when field is not Array' do
-      let(:field) { :title }
-
-      it 'comparing pattern and field value with "===" method' do
-        expect(pattern).to receive(:===).with(movie.send(field))
-        match
+      it 'matches by regexp' do
+        expect(movie.matches?(:title, /T.* Shawshank/)).to be(true)
       end
     end
 
-    context 'when field is Array' do
-      let(:field) { :genre }
-      let(:value) { movie.send(field) }
+    context 'when field is an Array' do
+      it 'matches the full string in any Array element' do
+        expect(movie.matches?(:genre, 'Drama')).to be(true)
+      end
 
-      it 'comparing field value and pattern with "any?" method' do
-        expect(value).to receive(:any?).with(pattern)
-        match
+      it 'not matches the part string in any Array element' do
+        expect(movie.matches?(:genre, 'Dra')).to be(false)
+      end
+
+      it 'matches by regexp' do
+        expect(movie.matches?(:genre, /Dra/)).to be(true)
       end
     end
 
-    context 'when wrong number of arguments' do
-      subject { movie.matches? }
+    context 'when field is a Date' do
+      it 'matches the Data object' do
+        expect(movie.matches?(:release_at, Date.new(1994, 10, 14))).to be(true)
+      end
 
-      its(:itself) { will raise_error(ArgumentError) }
+      it 'not matches the Data string' do
+        expect(movie.matches?(:release_at, '1994-10-14')).to be(false)
+      end
+
+      it 'matches the DateTime object' do
+        expect(movie.matches?(:release_at, DateTime.new(1994, 10, 14, 23, 1, 58))).to be(true)
+      end
+    end
+
+    context 'when field is an Integer' do
+      it 'matches the value' do
+        expect(movie.matches?(:duration, 142)).to be(true)
+      end
+
+      it 'not matches the string' do
+        expect(movie.matches?(:duration, '142')).to be(false)
+      end
+
+      it 'matches the value in float notation' do
+        expect(movie.matches?(:duration, 142.0)).to be(true)
+      end
     end
   end
 
   describe '#month' do
-    subject { movie.month }
+    subject(:month) { movie.month }
 
     context 'when movie has release_at value' do
-      let(:date)   { FFaker::Time.date }
-      let(:params) { { release_at: date } }
-
-      it { is_expected.to eq date.strftime('%B') }
-    end
-
-    context 'when movie has not release_at value' do
-      let(:params) { {} }
-
-      its(:itself) { will raise_error(NoMethodError) }
-    end
-
-    context 'when wrong number of arguments' do
-      subject { movie.month(:some_arg) }
-
-      its(:itself) { will raise_error(ArgumentError) }
+      it { is_expected.to eq 'October' }
     end
   end
 end

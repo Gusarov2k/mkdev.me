@@ -130,6 +130,10 @@ RSpec.describe Movie do
       it 'matches the value in float notation' do
         expect(movie.matches?(:duration, 142.0)).to be(true)
       end
+
+      it 'matches the range' do
+        expect(movie.matches?(:duration, (140..150))).to be(true)
+      end
     end
   end
 

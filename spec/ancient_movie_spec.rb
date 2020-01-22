@@ -1,6 +1,4 @@
 RSpec.describe AncientMovie do
-  it_behaves_like 'Movie children'
-
   describe '#to_s' do
     subject { movie.to_s }
 

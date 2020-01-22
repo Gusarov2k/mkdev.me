@@ -13,6 +13,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     rainbow (3.0.0)
+    require_all (3.0.0)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -39,6 +40,7 @@ GEM
     rubocop-rspec (1.37.1)
       rubocop (>= 0.68.1)
     ruby-progressbar (1.10.1)
+    timecop (0.9.1)
     unicode-display_width (1.6.0)
 
 PLATFORMS
@@ -46,10 +48,12 @@ PLATFORMS
 
 DEPENDENCIES
   pry
+  require_all
   rspec (~> 3.9)
   rspec-its
   rubocop
   rubocop-rspec
+  timecop
 
 RUBY VERSION
    ruby 2.6.5p114

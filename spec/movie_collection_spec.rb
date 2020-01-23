@@ -79,13 +79,13 @@ RSpec.describe MovieCollection do
     end
 
     context 'when one movie created in 1968-2000 in the file' do
-      let(:file_name) { './spec/fixtures/one_modern_movies.txt' }
+      let(:file_name) { './spec/fixtures/one_modern_movie.txt' }
 
       it { is_expected.to be_a_array_of(ModernMovie) }
     end
 
     context 'when one movie created after 2000 in the file' do
-      let(:file_name) { './spec/fixtures/one_new_movies.txt' }
+      let(:file_name) { './spec/fixtures/one_new_movie.txt' }
 
       it { is_expected.to be_a_array_of(NewMovie) }
     end

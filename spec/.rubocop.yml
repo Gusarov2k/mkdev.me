@@ -5,3 +5,6 @@ Metrics/BlockLength:
 
 RSpec/ExampleLength:
   Max: 10
+
+Layout/LineLength:
+  Enabled: false

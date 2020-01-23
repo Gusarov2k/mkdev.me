@@ -151,6 +151,30 @@ RSpec.describe MovieCollection do
 
       it { is_expected.to eq [] }
     end
+
+    context 'when ancient period given' do
+      subject { movie_collection.filter(period: :ancient) }
+
+      it { is_expected.to be_a_array_of(AncientMovie) }
+    end
+
+    context 'when classic period given' do
+      subject { movie_collection.filter(period: :classic) }
+
+      it { is_expected.to be_a_array_of(ClassicMovie) }
+    end
+
+    context 'when modern period given' do
+      subject { movie_collection.filter(period: :modern) }
+
+      it { is_expected.to be_a_array_of(ModernMovie) }
+    end
+
+    context 'when new period given' do
+      subject { movie_collection.filter(period: :new) }
+
+      it { is_expected.to be_a_array_of(NewMovie) }
+    end
   end
 
   describe '#stats' do

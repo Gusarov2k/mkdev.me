@@ -146,4 +146,21 @@ RSpec.describe Movie do
       it { is_expected.to eq 'October' }
     end
   end
+
+  describe '#period' do
+    subject { movie.period }
+
+    it { is_expected.to eq :any }
+
+    context 'when inherit from Movie' do
+      let(:movie) { TestMovie.new(movie_collection) }
+
+      before do
+        test_movie = Class.new(described_class)
+        stub_const('TestMovie', test_movie)
+      end
+
+      it { is_expected.to eq :test }
+    end
+  end
 end

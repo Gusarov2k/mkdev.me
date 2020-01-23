@@ -14,13 +14,13 @@ RSpec.describe Theatre do
     context 'when call in the day 12:00-16:00' do
       before { Timecop.freeze(Time.new(2011, 1, 16, 15, 0)) }
 
-      it { expect { show }.to output("Now showing: Modern Comedy - modern movie: stars Henry Fonda, Lee J. Cobb 15:00-16:36\n").to_stdout } # rubocop:disable Layout/LineLength
+      it { expect { show }.to output("Now showing: Modern Comedy - modern movie: stars Henry Fonda, Lee J. Cobb 15:00-16:36\n").to_stdout }
     end
 
     context 'when call in the evening 16:00-4:00' do
       before { Timecop.freeze(Time.new(2011, 1, 15, 19, 0)) }
 
-      it { expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 19:00-21:22\n").to_stdout } # rubocop:disable Layout/LineLength
+      it { expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 19:00-21:22\n").to_stdout }
     end
   end
 
@@ -34,7 +34,7 @@ RSpec.describe Theatre do
 
     context 'when movie not found' do
       it {
-        expect { theatre.when?('Not existing movie') }.to raise_error(RuntimeError, "There is no 'Not existing movie' found") # rubocop:disable Layout/LineLength
+        expect { theatre.when?('Not existing movie') }.to raise_error(RuntimeError, "There is no 'Not existing movie' found")
       }
     end
   end

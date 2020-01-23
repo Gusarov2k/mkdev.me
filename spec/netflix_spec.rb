@@ -19,7 +19,7 @@ RSpec.describe Netflix do
   end
 
   describe '#pay' do
-    it { expect(netflix.pay(25)).to change(netflix, :balance).by(25) }
+    it { expect { netflix.pay(25) }.to change(netflix, :balance).by(25) }
     it { expect { netflix.pay(-1) }.to raise_error(RuntimeError, 'You can’t reduce balance') }
   end
 
@@ -33,8 +33,7 @@ RSpec.describe Netflix do
 
     context 'when movie not found' do
       it {
-        expect { netflix.how_much?('Not existing movie') }.to
-        raise_error(RuntimeError, 'There is no "Not existing movie" found')
+        expect { netflix.how_much?('Not existing movie') }.to raise_error(RuntimeError, "There is no 'Not existing movie' found") # rubocop:disable Layout/LineLength
       }
     end
   end
@@ -47,8 +46,8 @@ RSpec.describe Netflix do
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
-      it { expect(show).to change(netflix, :balance).by(-1) }
-      it { is_expected.to output('Now showing: Ancient Comedy - old movie (1912 year) 15:00-17:55').to_stdout }
+      it { expect { show }.to change(netflix, :balance).by(-1) }
+      it { expect { show }.to output("Now showing: Ancient Comedy - old movie (1912 year) 15:00-17:55\n").to_stdout }
     end
 
     context 'when ClassicMovie' do
@@ -56,8 +55,8 @@ RSpec.describe Netflix do
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
-      it { expect(show).to change(netflix, :balance).by(-1.5) }
-      it { is_expected.to output('Now showing: Classic Comedy - classic movie, director Christopher Nolan (his 10 another films) 15:00-16:36').to_stdout } # rubocop:disable Layout/LineLength
+      it { expect { show }.to change(netflix, :balance).by(-1.5) }
+      it { expect { show }.to output("Now showing: Classic Comedy - classic movie, director Christopher Nolan (his 10 another films) 15:00-17:32\n").to_stdout } # rubocop:disable Layout/LineLength
     end
 
     context 'when ModernMovie' do
@@ -65,8 +64,8 @@ RSpec.describe Netflix do
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
-      it { expect(show).to change(netflix, :balance).by(-3) }
-      it { is_expected.to output('Now showing: Modern Comedy - modern movie: stars Henry Fonda, Lee J. Cobb 15:00-16:36').to_stdout } # rubocop:disable Layout/LineLength
+      it { expect { show }.to change(netflix, :balance).by(-3) }
+      it { expect { show }.to output("Now showing: Modern Comedy - modern movie: stars Henry Fonda, Lee J. Cobb 15:00-16:36\n").to_stdout } # rubocop:disable Layout/LineLength
     end
 
     context 'when NewMovie' do
@@ -74,8 +73,8 @@ RSpec.describe Netflix do
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
-      it { expect(show).to change(netflix, :balance).by(-5) }
-      it { is_expected.to output('Now showing: New Film - new movie, released 6 years ago! 15:00-17:22').to_stdout }
+      it { expect { show }.to change(netflix, :balance).by(-5) }
+      it { expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout } # rubocop:disable Layout/LineLength
     end
 
     context 'when not enough money' do
@@ -83,7 +82,7 @@ RSpec.describe Netflix do
 
       let(:netflix) { described_class.new(movie_collection, 0.3) }
 
-      it { is_expected.to raise_error(RuntimeError, 'There is not enough money. Your balance $0.3') }
+      it { expect { show }.to raise_error(RuntimeError, 'There is not enough money. Your balance $0.3') }
     end
   end
 end

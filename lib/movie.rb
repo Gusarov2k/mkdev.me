@@ -27,4 +27,8 @@ class Movie
   def month
     Date::MONTHNAMES[release_at.mon]
   end
+
+  def period
+    instance_of?(Movie) ? :any : self.class.to_s.gsub(/Movie/, '').downcase.to_sym
+  end
 end

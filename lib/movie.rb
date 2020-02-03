@@ -38,7 +38,7 @@ class Movie
   end
 
   def period
-    instance_of?(Movie) ? :any : self.class.to_s.gsub(/Movie/, '').downcase.to_sym
+    instance_of?(Movie) ? :any : self.class.to_s.gsub(/Movie/, '')
   end
 
   def self.create(collection, params)

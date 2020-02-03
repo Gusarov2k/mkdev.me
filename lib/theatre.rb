@@ -1,13 +1,14 @@
 class Theatre
   SCHEDULE_RULES = {
-    morning: OpenStruct.new(key: :class, value: [AncientMovie]),
-    day: OpenStruct.new(key: :genre, value: %w[Comedy Adventure]),
-    evening: OpenStruct.new(key: :genre, value: %w[Drama Horror])
+    morning: { period: /Ancient/ },
+    day: { genre: /Comedy|Adventure/ },
+    evening: { genre: /Drama|Horror/ }
   }.freeze
 
   TIMES_OF_DAY = {
     4..11 => :morning,
-    12..15 => :day
+    12..15 => :day,
+    16..23 => :evening
   }.freeze
 
   attr_reader :movie_collection
@@ -17,31 +18,36 @@ class Theatre
   end
 
   def show
-    time = Time.now
-    movie = movie_schedule(time)
-    movie_final_at = (time + movie.duration * 60)
-    puts "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
+    puts prepare_movie(Time.now)
   end
 
   def when?(title)
     movie = movie_collection.filter(title: title).first
     raise "There is no '#{title}' found" unless movie
 
-    %i[morning day evening].select { |t| check_movie(movie, SCHEDULE_RULES[t]) }.first || :never
+    %i[morning day evening].detect { |t| check_movie(movie, SCHEDULE_RULES[t]) }
   end
 
   private
 
-  def movie_schedule(time)
+  def prepare_movie(time)
+    return 'Sory, Theatre is closed now.' unless times_of_day(time.hour)
+
+    movie = choose_movie(time)
+    movie_final_at = (time + movie.duration * 60)
+    "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
+  end
+
+  def choose_movie(time)
     filter = SCHEDULE_RULES[times_of_day(time.hour)]
-    movie_collection.select { |m| check_movie(m, filter) }.first
+    movie_collection.filter(filter).first
   end
 
   def times_of_day(hour)
-    TIMES_OF_DAY.find { |k, _v| k === hour }&.last || :evening
+    TIMES_OF_DAY.find { |k, _v| k === hour }&.last
   end
 
   def check_movie(movie, filter)
-    ([movie.send(filter.key)].flatten & filter.value).any?
+    filter.each_pair.inject([movie]) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }.any?
   end
 end

@@ -43,7 +43,7 @@ RSpec.describe Netflix do
     before { Timecop.freeze(Time.new(2011, 1, 15, 15, 0)) }
 
     context 'when AncientMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: :ancient) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: /Ancient/) }
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
@@ -52,7 +52,7 @@ RSpec.describe Netflix do
     end
 
     context 'when ClassicMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: :classic) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: /Classic/) }
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
@@ -66,7 +66,7 @@ RSpec.describe Netflix do
     end
 
     context 'when ModernMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: :modern) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: /Modern/) }
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 
@@ -80,7 +80,7 @@ RSpec.describe Netflix do
     end
 
     context 'when NewMovie' do
-      subject(:show) { netflix.show(genre: 'Crime', period: :new) }
+      subject(:show) { netflix.show(genre: 'Crime', period: /New/) }
 
       let(:netflix) { described_class.new(movie_collection, 100) }
 

@@ -1,4 +1,11 @@
 class Netflix
+  PRICE = {
+    'AncientMovie' => 1,
+    'ClassicMovie' => 1.5,
+    'ModernMovie' => 3,
+    'NewMovie' => 5
+  }.freeze
+
   attr_reader :movie_collection, :balance
 
   def initialize(movie_collection, balance = 0)
@@ -16,12 +23,7 @@ class Netflix
     movie = movie_collection.filter(title: title).first
     raise "There is no '#{title}' found" unless movie
 
-    case movie.class.to_s
-    when 'AncientMovie' then 1
-    when 'ClassicMovie' then 1.5
-    when 'ModernMovie'  then 3
-    when 'NewMovie'     then 5
-    end
+    PRICE[movie.class.to_s]
   end
 
   def show(**params)

@@ -65,30 +65,6 @@ RSpec.describe MovieCollection do
 
       it { is_expected.to eq [] }
     end
-
-    context 'when one movie created in 1900-1945 in the file' do
-      let(:file_name) { './spec/fixtures/one_ancient_movie.txt' }
-
-      it { is_expected.to be_a_array_of(AncientMovie) }
-    end
-
-    context 'when one movie created in 1945-1968 in the file' do
-      let(:file_name) { './spec/fixtures/one_classic_movie.txt' }
-
-      it { is_expected.to be_a_array_of(ClassicMovie) }
-    end
-
-    context 'when one movie created in 1968-2000 in the file' do
-      let(:file_name) { './spec/fixtures/one_modern_movie.txt' }
-
-      it { is_expected.to be_a_array_of(ModernMovie) }
-    end
-
-    context 'when one movie created after 2000 in the file' do
-      let(:file_name) { './spec/fixtures/one_new_movie.txt' }
-
-      it { is_expected.to be_a_array_of(NewMovie) }
-    end
   end
 
   describe '#sort_by' do

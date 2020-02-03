@@ -14,7 +14,7 @@ class MovieCollection
 
   def initialize(file_name)
     csv = CSV.read(file_name, col_sep: '|', headers: Movie::HEADERS, converters: :imdb_list_converter)
-    @movies = csv.map { |row| create_movie(self, row.to_h) }
+    @movies = csv.map { |row| Movie.create(self, row.to_h) }
     @file_name = file_name
   end
 
@@ -56,16 +56,4 @@ class MovieCollection
     Date.strptime(str, patern)
   end
   private_class_method :date_safe_parse
-
-  private
-
-  def create_movie(collection, params)
-    case params[:year]
-    when (1900..1945) then AncientMovie.new(collection, params)
-    when (1945..1968) then ClassicMovie.new(collection, params)
-    when (1968..2000) then ModernMovie.new(collection, params)
-    when (2000..)     then NewMovie.new(collection, params)
-    else Movie.new(collection, params)
-    end
-  end
 end

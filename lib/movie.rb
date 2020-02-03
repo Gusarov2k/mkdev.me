@@ -1,5 +1,14 @@
 class Movie
+  Dir[File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', '*_movie.rb'))].sort.each { |f| require f }
+
   HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
+  MOVIE_PERIODS = {
+    1900..1945 => AncientMovie,
+    1945..1968 => ClassicMovie,
+    1968..2000 => ModernMovie,
+    2000.. => NewMovie
+  }.freeze
+
   attr_reader(*HEADERS)
   attr_reader :movie_collection
 
@@ -31,4 +40,13 @@ class Movie
   def period
     instance_of?(Movie) ? :any : self.class.to_s.gsub(/Movie/, '').downcase.to_sym
   end
+
+  def self.create(collection, params)
+    movie_klass(params[:year]).new(collection, params)
+  end
+
+  def self.movie_klass(year)
+    MOVIE_PERIODS.find { |k, _v| k === year }&.last || Movie
+  end
+  private_class_method :movie_klass
 end

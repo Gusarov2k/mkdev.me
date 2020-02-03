@@ -5,7 +5,7 @@ class Theatre
     evening: { genre: /Drama|Horror/ }
   }.freeze
 
-  TIMES_OF_DAY = {
+  OPERATING_MODE = {
     4..11 => :morning,
     12..15 => :day,
     16..23 => :evening
@@ -31,7 +31,7 @@ class Theatre
   private
 
   def prepare_movie(time)
-    return 'Sory, Theatre is closed now.' unless times_of_day(time.hour)
+    return 'Sory, Theatre is closed now.' unless operating_mode(time.hour)
 
     movie = choose_movie(time)
     movie_final_at = (time + movie.duration * 60)
@@ -39,12 +39,12 @@ class Theatre
   end
 
   def choose_movie(time)
-    filter = SCHEDULE_RULES[times_of_day(time.hour)]
+    filter = SCHEDULE_RULES[operating_mode(time.hour)]
     movie_collection.filter(filter).first
   end
 
-  def times_of_day(hour)
-    TIMES_OF_DAY.find { |k, _v| k === hour }&.last
+  def operating_mode(hour)
+    OPERATING_MODE.find { |k, _v| k === hour }&.last
   end
 
   def check_movie(movie, filter)

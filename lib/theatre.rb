@@ -39,7 +39,7 @@ class Theatre
   end
 
   def choose_movie(time)
-    filter = SCHEDULE_RULES[operating_mode(time.hour)]
+    filter = SCHEDULE_RULES.fetch(operating_mode(time.hour))
     movie_collection.filter(filter).first
   end
 
@@ -48,6 +48,6 @@ class Theatre
   end
 
   def check_movie(movie, filter)
-    filter.each_pair.inject([movie]) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }.any?
+    filter.all? { |k, v| movie.matches?(k, v) }
   end
 end

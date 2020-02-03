@@ -1,4 +1,15 @@
 class Theatre
+  SCHEDULE_RULES = {
+    morning: OpenStruct.new(key: :class, value: [AncientMovie]),
+    day: OpenStruct.new(key: :genre, value: %w[Comedy Adventure]),
+    evening: OpenStruct.new(key: :genre, value: %w[Drama Horror])
+  }.freeze
+
+  TIMES_OF_DAY = {
+    4..11 => :morning,
+    12..15 => :day
+  }.freeze
+
   attr_reader :movie_collection
 
   def initialize(movie_collection)
@@ -16,32 +27,21 @@ class Theatre
     movie = movie_collection.filter(title: title).first
     raise "There is no '#{title}' found" unless movie
 
-    return :morning if morning?(movie)
-    return :day     if day?(movie)
-    return :evening if evening?(movie)
-
-    :never
+    %i[morning day evening].select { |t| check_movie(movie, SCHEDULE_RULES[t]) }.first || :never
   end
 
   private
 
   def movie_schedule(time)
-    case time.hour
-    when (4..11)  then movie_collection.select { |m| morning?(m) }.first
-    when (12..15) then movie_collection.select { |m| day?(m) }.first
-    else movie_collection.select { |m| evening?(m) }.first
-    end
+    filter = SCHEDULE_RULES[times_of_day(time.hour)]
+    movie_collection.select { |m| check_movie(m, filter) }.first
   end
 
-  def morning?(movie)
-    movie.is_a?(AncientMovie)
+  def times_of_day(hour)
+    TIMES_OF_DAY.find { |k, _v| k === hour }&.last || :evening
   end
 
-  def day?(movie)
-    movie.has_genre?('Comedy') || movie.has_genre?('Adventure')
-  end
-
-  def evening?(movie)
-    movie.has_genre?('Drama') || movie.has_genre?('Horror')
+  def check_movie(movie, filter)
+    ([movie.send(filter.key)].flatten & filter.value).any?
   end
 end

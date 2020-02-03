@@ -1,5 +1,7 @@
 class ClassicMovie < Movie
   def to_s
-    "#{title} - classic movie, director #{director} (his 10 another films)"
+    # binding.pry
+    movies_count = movie_collection.filter(director: director).count
+    "#{title} - classic movie, director #{director} (his #{movies_count} another films)"
   end
 end

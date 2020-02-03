@@ -60,7 +60,7 @@ RSpec.describe Netflix do
 
       it {
         expect { show }
-          .to output("Now showing: Classic Comedy - classic movie, director Christopher Nolan (his 10 another films) 15:00-17:32\n")
+          .to output("Now showing: Classic Comedy - classic movie, director Christopher Nolan (his 2 another films) 15:00-17:32\n")
           .to_stdout
       }
     end

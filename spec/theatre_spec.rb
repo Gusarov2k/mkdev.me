@@ -8,6 +8,7 @@ RSpec.describe Theatre do
     context 'when call in the morning 4:00-12:00' do
       before { Timecop.freeze(Time.new(2011, 1, 15, 11, 0)) }
 
+      # it { show }
       it { expect { show }.to output("Now showing: Ancient Crime - old movie (1932 year) 11:00-13:22\n").to_stdout }
     end
 

@@ -1,5 +1,8 @@
 class Movie
-  Dir[File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', '*_movie.rb'))].sort.each { |f| require f }
+  require 'ancient_movie'
+  require 'classic_movie'
+  require 'modern_movie'
+  require 'new_movie'
 
   HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
   MOVIE_PERIODS = {

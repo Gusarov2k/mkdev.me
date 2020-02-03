@@ -35,6 +35,40 @@ RSpec.describe Movie do
     end
   end
 
+  describe '.create' do
+    subject { described_class.create(movie_collection, params) }
+
+    context 'when movie created in 1900-1945' do
+      let(:params) { { year: 1945 } }
+
+      it { is_expected.to be_an_instance_of(AncientMovie) }
+    end
+
+    context 'when movie created in 1945-1968' do
+      let(:params) { { year: 1968 } }
+
+      it { is_expected.to be_an_instance_of(ClassicMovie) }
+    end
+
+    context 'when movie created in 1968-2000' do
+      let(:params) { { year: 2000 } }
+
+      it { is_expected.to be_an_instance_of(ModernMovie) }
+    end
+
+    context 'when movie created after 2000' do
+      let(:params) { { year: 2008 } }
+
+      it { is_expected.to be_an_instance_of(NewMovie) }
+    end
+
+    context 'when movie year not set' do
+      let(:params) { { year: nil } }
+
+      it { is_expected.to be_an_instance_of(described_class) }
+    end
+  end
+
   describe '#to_s' do
     subject { movie.to_s }
 

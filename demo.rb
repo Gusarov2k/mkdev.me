@@ -5,9 +5,7 @@ require 'pry'
 require './lib/movie.rb'
 Dir['./lib/*_movie.rb'].sort.each { |file| require file }
 Dir['./lib/*.rb'].sort.each { |file| require file }
-# m = AncientMovie.new('', year: 1930)
 
-# binding.pry
 file_name = ARGV.first || 'movies.txt'
 movies = MovieCollection.new(file_name)
 

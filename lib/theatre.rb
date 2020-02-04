@@ -40,7 +40,7 @@ class Theatre
 
   def choose_movie(time)
     filter = SCHEDULE_RULES.fetch(operating_mode(time.hour))
-    movie_collection.filter(filter).first
+    movie_collection.filter(filter).sample
   end
 
   def operating_mode(hour)

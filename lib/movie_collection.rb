@@ -1,4 +1,5 @@
 class MovieCollection
+  include Enumerable
   attr_reader :file_name
 
   CSV::Converters[:imdb_list_converter] = lambda { |str, field_info|
@@ -22,14 +23,18 @@ class MovieCollection
     @movies
   end
 
-  def sort_by(arg = nil, &block)
-    return @movies.sort_by(&block) if block_given?
+  def each(&block)
+    @movies.each { |m| block.call(m) }
+  end
 
-    @movies.sort_by(&arg)
+  def sort_by(arg = nil, &block)
+    return super(&block) if block_given?
+
+    super(&arg)
   end
 
   def select(arg = nil, &block)
-    return @movies.select(&block) if block_given?
+    return super(&block) if block_given?
 
     key, val = arg.each_pair.first
     @movies.select { |m| m.send(key.to_s).include?(val) }

@@ -1,8 +1,8 @@
 class Movie
-  require 'ancient_movie'
-  require 'classic_movie'
-  require 'modern_movie'
-  require 'new_movie'
+  require_relative 'ancient_movie'
+  require_relative 'classic_movie'
+  require_relative 'modern_movie'
+  require_relative 'new_movie'
 
   HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
   MOVIE_PERIODS = {

@@ -6,12 +6,12 @@ RSpec.describe Theatre do
     subject(:show) { theatre.show }
 
     context 'when call in the morning 4:00-12:00' do
-      let(:str1) { 'Now showing: Ancient Crime - old movie \(1932 year\) 11:00-13:22' }
-      let(:str2) { 'Now showing: Ancient Crime2 - old movie \(1933 year\) 11:00-13:22' }
+      let(:str1) { 'Now showing: Ancient Crime - old movie (1932 year) 11:00-13:22' }
+      let(:str2) { 'Now showing: Ancient Crime2 - old movie (1933 year) 11:00-13:22' }
 
       before { Timecop.freeze(Time.new(2011, 1, 15, 11, 0)) }
 
-      it { expect { show }.to output(/(#{str1})|(#{str2})/).to_stdout }
+      it { expect { show }.to output(Regexp.union(str1, str2)).to_stdout }
     end
 
     context 'when call in the day 12:00-16:00' do

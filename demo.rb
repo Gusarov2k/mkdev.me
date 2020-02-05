@@ -3,11 +3,14 @@ require 'csv'
 require 'ostruct'
 require 'pry'
 require './lib/movie.rb'
+# require './lib/modules/cashbox.rb'
 Dir['./lib/*_movie.rb'].sort.each { |file| require file }
 Dir['./lib/*.rb'].sort.each { |file| require file }
 
 file_name = ARGV.first || 'movies.txt'
 movies = MovieCollection.new(file_name)
+# theatre = Theatre.new(movies)
+# binding.pry
 
 puts '# 5 movies with maximum duration selecting with symbol'
 puts movies.sort_by(:duration).last(5)

@@ -1,4 +1,6 @@
 class Theatre
+  include Cashbox
+
   SCHEDULE_RULES = {
     morning: { period: /Ancient/ },
     day: { genre: /Comedy|Adventure/ },

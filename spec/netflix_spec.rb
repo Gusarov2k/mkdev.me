@@ -2,33 +2,44 @@ RSpec.describe Netflix do
   let(:movie_collection) { MovieCollection.new('./spec/fixtures/netflix_movies.txt') }
   let(:netflix)          { described_class.new(movie_collection) }
 
+  before do
+    described_class.setup_cashbox
+    described_class.take('Bank')
+  end
+
   describe '.new' do
     context 'when initial balance not set' do
-      subject { described_class.new(movie_collection) }
+      subject(:new) { described_class.new(movie_collection) }
 
-      its(:balance) { is_expected.to eq 0 }
+      it {
+        new
+        expect(described_class.cash).to eq Money.new(0, 'USD')
+      }
     end
 
     context 'when creates with balance' do
-      subject { described_class.new(movie_collection, balance) }
+      subject(:new) { described_class.new(movie_collection, balance) }
 
-      let(:balance) { 12.45 }
+      let(:balance) { Money.new(1245, 'USD') }
 
-      its(:balance) { is_expected.to eq balance }
+      it {
+        new
+        expect(described_class.cash).to eq balance
+      }
     end
   end
 
   describe '#pay' do
-    it { expect { netflix.pay(25) }.to change(netflix, :balance).by(25) }
-    it { expect { netflix.pay(-1) }.to raise_error(RuntimeError, 'You can’t reduce balance') }
+    it { expect { netflix.pay(Money.new(2500, 'USD')) }.to change(described_class, :cash).by(Money.new(2500, 'USD')) }
+    it { expect { netflix.pay(Money.new(-100, 'USD')) }.to raise_error(RuntimeError, 'You can’t reduce balance') }
   end
 
   describe '#how_much?' do
     context 'when movie found' do
-      it { expect(netflix.how_much?('Ancient Crime')).to eq 1 }
-      it { expect(netflix.how_much?('Classic Drama')).to eq 1.5 }
-      it { expect(netflix.how_much?('Modern Drama')).to eq 3 }
-      it { expect(netflix.how_much?('New Film')).to eq 5 }
+      it { expect(netflix.how_much?('Ancient Crime')).to eq Money.new(100, 'USD') }
+      it { expect(netflix.how_much?('Classic Drama')).to eq Money.new(150, 'USD') }
+      it { expect(netflix.how_much?('Modern Drama')).to eq Money.new(300, 'USD') }
+      it { expect(netflix.how_much?('New Film')).to eq Money.new(500, 'USD') }
     end
 
     context 'when movie not found' do
@@ -45,18 +56,18 @@ RSpec.describe Netflix do
     context 'when AncientMovie' do
       subject(:show) { netflix.show(genre: 'Comedy', period: /Ancient/) }
 
-      let(:netflix) { described_class.new(movie_collection, 100) }
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(netflix, :balance).by(-1) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(-100, 'USD')) }
       it { expect { show }.to output("Now showing: Ancient Comedy - old movie (1912 year) 15:00-17:55\n").to_stdout }
     end
 
     context 'when ClassicMovie' do
       subject(:show) { netflix.show(genre: 'Comedy', period: /Classic/) }
 
-      let(:netflix) { described_class.new(movie_collection, 100) }
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(netflix, :balance).by(-1.5) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(-150, 'USD')) }
 
       it {
         expect { show }
@@ -68,9 +79,9 @@ RSpec.describe Netflix do
     context 'when ModernMovie' do
       subject(:show) { netflix.show(genre: 'Comedy', period: /Modern/) }
 
-      let(:netflix) { described_class.new(movie_collection, 100) }
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(netflix, :balance).by(-3) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(-300, 'USD')) }
 
       it {
         expect { show }
@@ -82,9 +93,9 @@ RSpec.describe Netflix do
     context 'when NewMovie' do
       subject(:show) { netflix.show(genre: 'Crime', period: /New/) }
 
-      let(:netflix) { described_class.new(movie_collection, 100) }
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(netflix, :balance).by(-5) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(-500, 'USD')) }
 
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
@@ -94,9 +105,9 @@ RSpec.describe Netflix do
     context 'when not enough money' do
       subject(:show) { netflix.show }
 
-      let(:netflix) { described_class.new(movie_collection, 0.3) }
+      let(:netflix) { described_class.new(movie_collection, Money.new(30, 'USD')) }
 
-      it { expect { show }.to raise_error(RuntimeError, 'There is not enough money. Your balance $0.3') }
+      it { expect { show }.to raise_error(RuntimeError, 'There is not enough money. Your balance $0.30') }
     end
   end
 end

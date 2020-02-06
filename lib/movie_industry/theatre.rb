@@ -43,8 +43,8 @@ module MovieIndustry
       raise "There is no '#{title}' in actual shedule" unless showing_at
 
       price = PRICE.fetch(showing_at)
-      enroll(price)
       puts "You buy ticket to '#{title}'"
+      enroll(price)
     end
 
     private

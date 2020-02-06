@@ -1,5 +1,5 @@
 module MovieIndustry
-  class AncientMovie < MovieIndustry::Movie
+  class AncientMovie < Movie
     def to_s
       "#{title} - old movie (#{year} year)"
     end

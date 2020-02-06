@@ -11,26 +11,20 @@ RSpec.describe MovieIndustry::Netflix do
     context 'when initial balance not set' do
       subject(:new) { described_class.new(movie_collection) }
 
-      it {
-        new
-        expect(described_class.cash).to eq Money.new(0, 'USD')
-      }
+      its(:client_balance) { is_expected.to eq Money.new(0, 'USD') }
     end
 
     context 'when creates with balance' do
-      subject(:new) { described_class.new(movie_collection, balance) }
+      subject(:new) { described_class.new(movie_collection, client_balance) }
 
-      let(:balance) { Money.new(1245, 'USD') }
+      let(:client_balance) { Money.new(1245, 'USD') }
 
-      it {
-        new
-        expect(described_class.cash).to eq balance
-      }
+      its(:client_balance) { is_expected.to eq client_balance }
     end
   end
 
   describe '#pay' do
-    it { expect { netflix.pay(Money.new(2500, 'USD')) }.to change(described_class, :cash).by(Money.new(2500, 'USD')) }
+    it { expect { netflix.pay(Money.new(2500, 'USD')) }.to change(netflix, :client_balance).by(Money.new(2500, 'USD')) }
     it { expect { netflix.pay(Money.new(-100, 'USD')) }.to raise_error(RuntimeError, 'You can’t reduce balance') }
   end
 
@@ -58,7 +52,8 @@ RSpec.describe MovieIndustry::Netflix do
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(-100, 'USD')) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(100, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-100, 'USD')) }
       it { expect { show }.to output("Now showing: Ancient Comedy - old movie (1912 year) 15:00-17:55\n").to_stdout }
     end
 
@@ -67,7 +62,8 @@ RSpec.describe MovieIndustry::Netflix do
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(-150, 'USD')) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(150, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-150, 'USD')) }
 
       it {
         expect { show }
@@ -81,7 +77,8 @@ RSpec.describe MovieIndustry::Netflix do
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(-300, 'USD')) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(300, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-300, 'USD')) }
 
       it {
         expect { show }
@@ -95,7 +92,8 @@ RSpec.describe MovieIndustry::Netflix do
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(-500, 'USD')) }
+      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
 
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout

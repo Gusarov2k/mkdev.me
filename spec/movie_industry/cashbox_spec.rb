@@ -19,7 +19,7 @@ RSpec.describe MovieIndustry::Cashbox do
     context 'when negative enroll' do
       subject(:enroll) { test_object.enroll(Money.new(-100, 'USD')) }
 
-      it { expect { enroll }.to change(test_object, :cash).by(Money.new(-100, 'USD')) }
+      it { expect { enroll }.to raise_error(RuntimeError, 'You can’t reduce cash') }
     end
   end
 

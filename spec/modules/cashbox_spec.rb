@@ -20,10 +20,10 @@ RSpec.describe Cashbox do
       it { expect { enroll }.to change(instance, :cash).by(Money.new(100, 'USD')) }
     end
 
-    context 'when try to negative enroll' do
+    context 'when negative enroll' do
       subject(:enroll) { instance.enroll(Money.new(-100, 'USD')) }
 
-      it { expect { enroll }.to raise_error(RuntimeError, 'You can’t reduce cash') }
+      it { expect { enroll }.to change(instance, :cash).by(Money.new(-100, 'USD')) }
     end
   end
 

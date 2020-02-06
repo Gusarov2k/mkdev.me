@@ -34,9 +34,9 @@ module MovieIndustry
       movie, price, movie_final_at = prepare_movie(time, **params)
       raise "There is not enough money. Your balance $#{@client_balance}" if @client_balance < price
 
+      puts "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
       self.class.enroll(price)
       @client_balance -= price
-      puts "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
     end
 
     private

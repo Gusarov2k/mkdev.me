@@ -13,14 +13,13 @@ module MovieIndustry
 
     def initialize(movie_collection, balance = Money.new(0, 'USD'))
       @movie_collection = movie_collection
-      Netflix.setup_cashbox if Netflix.cash.nil?
       pay(balance)
     end
 
     def pay(amount)
       raise 'You can’t reduce balance' if amount.negative?
 
-      Netflix.enroll(amount)
+      self.class.enroll(amount)
     end
 
     def how_much?(title)

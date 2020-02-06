@@ -1,4 +1,4 @@
-RSpec.describe MovieCollection do
+RSpec.describe MovieIndustry::MovieCollection do
   let(:file_name)        { './spec/fixtures/movies.txt' }
   let(:movie_collection) { described_class.new(file_name) }
   let(:movie_params) do
@@ -53,7 +53,7 @@ RSpec.describe MovieCollection do
         }
       end
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'return movie instance with data from file' do
         expect(movies.first).to have_attributes(movie_params)
@@ -71,7 +71,7 @@ RSpec.describe MovieCollection do
     context 'when call with symbol' do
       subject(:sorted) { movie_collection.sort_by(:year) }
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'sorts movies by year' do
         expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
@@ -81,7 +81,7 @@ RSpec.describe MovieCollection do
     context 'when call with block' do
       subject(:sorted) { movie_collection.sort_by { |m| m.year.to_s } }
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'sorts movies by year like in symbol case' do
         expect(sorted.map(&:year)).to eq [1957, 1972, 1974, 1994, 2008]
@@ -93,7 +93,7 @@ RSpec.describe MovieCollection do
     context 'when call with hash' do
       subject(:list) { movie_collection.select(country: 'USA') }
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'returns only movies produced in USA' do
         expect(list).to all have_attributes(country: 'USA')
@@ -103,7 +103,7 @@ RSpec.describe MovieCollection do
     context 'when call with block' do
       subject(:list) { movie_collection.select { |m| m.country == 'USA' } }
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'returns only movies produced in USA like in symbol case' do
         expect(list).to all have_attributes(country: 'USA')
@@ -115,7 +115,7 @@ RSpec.describe MovieCollection do
     context 'when movie with given filters exists' do
       subject(:list) { movie_collection.filter(genre: 'Crime', year: (1993..1995), title: /The Shawshank/i) }
 
-      it { is_expected.to be_a_array_of(Movie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::Movie) }
 
       it 'Select The Shawshank Redemption Movie' do
         expect(list.first).to have_attributes(movie_params)
@@ -131,25 +131,25 @@ RSpec.describe MovieCollection do
     context 'when ancient period given' do
       subject { movie_collection.filter(period: :ancient) }
 
-      it { is_expected.to be_a_array_of(AncientMovie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::AncientMovie) }
     end
 
     context 'when classic period given' do
       subject { movie_collection.filter(period: :classic) }
 
-      it { is_expected.to be_a_array_of(ClassicMovie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::ClassicMovie) }
     end
 
     context 'when modern period given' do
       subject { movie_collection.filter(period: :modern) }
 
-      it { is_expected.to be_a_array_of(ModernMovie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::ModernMovie) }
     end
 
     context 'when new period given' do
       subject { movie_collection.filter(period: :new) }
 
-      it { is_expected.to be_a_array_of(NewMovie) }
+      it { is_expected.to be_a_array_of(MovieIndustry::NewMovie) }
     end
   end
 

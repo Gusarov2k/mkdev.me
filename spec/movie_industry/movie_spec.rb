@@ -1,4 +1,4 @@
-RSpec.describe Movie do
+RSpec.describe MovieIndustry::Movie do
   let(:movie)            { described_class.new(movie_collection, params) }
   let(:movie_collection) { double }
   let(:existing_genres)  { %w[Crime Drama Action] }
@@ -41,25 +41,25 @@ RSpec.describe Movie do
     context 'when movie created in 1900-1945' do
       let(:params) { { year: 1945 } }
 
-      it { is_expected.to be_an_instance_of(AncientMovie) }
+      it { is_expected.to be_an_instance_of(MovieIndustry::AncientMovie) }
     end
 
     context 'when movie created in 1945-1968' do
       let(:params) { { year: 1968 } }
 
-      it { is_expected.to be_an_instance_of(ClassicMovie) }
+      it { is_expected.to be_an_instance_of(MovieIndustry::ClassicMovie) }
     end
 
     context 'when movie created in 1968-2000' do
       let(:params) { { year: 2000 } }
 
-      it { is_expected.to be_an_instance_of(ModernMovie) }
+      it { is_expected.to be_an_instance_of(MovieIndustry::ModernMovie) }
     end
 
     context 'when movie created after 2000' do
       let(:params) { { year: 2008 } }
 
-      it { is_expected.to be_an_instance_of(NewMovie) }
+      it { is_expected.to be_an_instance_of(MovieIndustry::NewMovie) }
     end
 
     context 'when movie year not set' do

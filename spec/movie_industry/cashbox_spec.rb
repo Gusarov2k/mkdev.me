@@ -1,8 +1,8 @@
 class FooClass
-  include Cashbox
+  include MovieIndustry::Cashbox
 end
 
-RSpec.describe Cashbox do
+RSpec.describe MovieIndustry::Cashbox do
   subject { instance }
 
   let(:instance) { FooClass.new }

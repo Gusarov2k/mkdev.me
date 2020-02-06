@@ -3,12 +3,6 @@ RSpec.describe MovieIndustry::Cashbox do
 
   let(:test_object) { Object.new.extend(described_class) }
 
-  before { test_object.setup_cashbox }
-
-  describe '#setup_cashbox' do
-    it { expect(test_object.setup_cashbox).to eq(Money.new(0, 'USD')) }
-  end
-
   describe '#enroll' do
     context 'when positive enroll' do
       subject(:enroll) { test_object.enroll(Money.new(100, 'USD')) }

@@ -25,7 +25,7 @@ module MovieIndustry
     end
 
     def each(&block)
-      @movies.each { |m| block.call(m) }
+      @movies.each(&block)
     end
 
     def sort_by(arg = nil, &block)

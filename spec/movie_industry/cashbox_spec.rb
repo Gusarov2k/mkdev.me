@@ -1,39 +1,35 @@
-class FooClass
-  include MovieIndustry::Cashbox
-end
-
 RSpec.describe MovieIndustry::Cashbox do
-  subject { instance }
+  subject { test_object }
 
-  let(:instance) { FooClass.new }
+  let(:test_object) { Object.new.extend(described_class) }
 
-  before { instance.setup_cashbox }
+  before { test_object.setup_cashbox }
 
   describe '#setup_cashbox' do
-    it { expect(FooClass.new.setup_cashbox).to eq(Money.new(0, 'USD')) }
+    it { expect(test_object.setup_cashbox).to eq(Money.new(0, 'USD')) }
   end
 
   describe '#enroll' do
     context 'when positive enroll' do
-      subject(:enroll) { instance.enroll(Money.new(100, 'USD')) }
+      subject(:enroll) { test_object.enroll(Money.new(100, 'USD')) }
 
-      it { expect { enroll }.to change(instance, :cash).by(Money.new(100, 'USD')) }
+      it { expect { enroll }.to change(test_object, :cash).by(Money.new(100, 'USD')) }
     end
 
     context 'when negative enroll' do
-      subject(:enroll) { instance.enroll(Money.new(-100, 'USD')) }
+      subject(:enroll) { test_object.enroll(Money.new(-100, 'USD')) }
 
-      it { expect { enroll }.to change(instance, :cash).by(Money.new(-100, 'USD')) }
+      it { expect { enroll }.to change(test_object, :cash).by(Money.new(-100, 'USD')) }
     end
   end
 
   describe '#cash' do
-    context 'when zero balance' do
+    context 'when new Cashbox' do
       its(:cash) { is_expected.to eq Money.new(0, 'USD') }
     end
 
     context 'when non zero balance' do
-      before { instance.enroll(Money.new(100, 'USD')) }
+      before { test_object.enroll(Money.new(100, 'USD')) }
 
       its(:cash) { is_expected.to eq Money.new(100, 'USD') }
     end
@@ -41,15 +37,15 @@ RSpec.describe MovieIndustry::Cashbox do
 
   describe '#take' do
     context 'when Bank take money' do
-      subject(:take) { instance.take('Bank') }
+      subject(:take) { test_object.take('Bank') }
 
-      before { instance.enroll(Money.new(100, 'USD')) }
+      before { test_object.enroll(Money.new(100, 'USD')) }
 
-      it { expect { take }.to change(instance, :cash).to(Money.new(0, 'USD')) }
+      it { expect { take }.to change(test_object, :cash).to(Money.new(0, 'USD')) }
     end
 
     context 'when non Bank take money' do
-      subject(:take) { instance.take('Rogue') }
+      subject(:take) { test_object.take('Rogue') }
 
       it { expect { take }.to raise_error(RuntimeError, 'This is a Robbery!') }
     end

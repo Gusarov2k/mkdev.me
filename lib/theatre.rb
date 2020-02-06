@@ -13,10 +13,17 @@ class Theatre
     16..23 => :evening
   }.freeze
 
+  PRICE = {
+    morning: Money.new(300, 'USD'),
+    day: Money.new(500, 'USD'),
+    evening: Money.new(1000, 'USD')
+  }.freeze
+
   attr_reader :movie_collection
 
   def initialize(movie_collection)
     @movie_collection = movie_collection
+    setup_cashbox
   end
 
   def show
@@ -28,6 +35,15 @@ class Theatre
     raise "There is no '#{title}' found" unless movie
 
     %i[morning day evening].detect { |t| check_movie(movie, SCHEDULE_RULES[t]) }
+  end
+
+  def buy_ticket(title)
+    showing_at = when?(title)
+    raise "There is no '#{title}' in actual shedule" unless showing_at
+
+    price = PRICE.fetch(showing_at)
+    enroll(price)
+    puts "You buy ticket to '#{title}'"
   end
 
   private

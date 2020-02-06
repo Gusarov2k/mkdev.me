@@ -9,17 +9,17 @@ module MovieIndustry
       NewMovie => Money.new(500, 'USD')
     }.freeze
 
-    attr_reader :movie_collection
+    attr_reader :movie_collection, :client_balance
 
-    def initialize(movie_collection, balance = Money.new(0, 'USD'))
+    def initialize(movie_collection, client_balance = Money.new(0, 'USD'))
       @movie_collection = movie_collection
-      pay(balance)
+      @client_balance = client_balance
     end
 
     def pay(amount)
       raise 'You can’t reduce balance' if amount.negative?
 
-      self.class.enroll(amount)
+      @client_balance += amount
     end
 
     def how_much?(title)
@@ -31,11 +31,11 @@ module MovieIndustry
 
     def show(**params)
       time = Time.now
-      balance = Netflix.cash
       movie, price, movie_final_at = prepare_movie(time, **params)
-      raise "There is not enough money. Your balance $#{balance}" if balance < price
+      raise "There is not enough money. Your balance $#{@client_balance}" if @client_balance < price
 
-      Netflix.enroll(-price)
+      self.class.enroll(price)
+      @client_balance -= price
       puts "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
     end
 

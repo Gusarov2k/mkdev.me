@@ -75,13 +75,22 @@ puts "\n# Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
 
 netflix1.pay(Money.new(100_00, 'USD'))
 puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+puts "\n# But client1 balanse is #{netflix1.client_balance.format}"
 
 netflix2 = MovieIndustry::Netflix.new(movies)
 puts "\n# Netflix balanse is still #{MovieIndustry::Netflix.cash.format}"
 
 netflix3 = MovieIndustry::Netflix.new(movies, Money.new(1000, 'USD'))
+puts "\n# Netflix balanse is still #{MovieIndustry::Netflix.cash.format}"
+puts "\n# But client3 balanse is #{netflix3.client_balance.format}"
+
+netflix2.pay(Money.new(10_00, 'USD'))
 puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+puts "\n# But client2 balanse is #{netflix1.client_balance.format}"
 
 netflix2.show(genre: 'Comedy', period: /Ancient/)
 netflix3.show(genre: 'Crime', period: /New/)
+puts "\n# Now client1: #{netflix1.client_balance.format}"
+puts "\n# Now client2: #{netflix2.client_balance.format}"
+puts "\n# Now client3: #{netflix3.client_balance.format}"
 puts "\n# And finaly Netflix balanse is #{MovieIndustry::Netflix.cash.format}"

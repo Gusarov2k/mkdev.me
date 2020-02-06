@@ -16,6 +16,8 @@ module MovieIndustry
     end
 
     def enroll(amount)
+      raise 'You can’t reduce cash' if amount.negative?
+
       @cashbox_balance += amount
     end
 

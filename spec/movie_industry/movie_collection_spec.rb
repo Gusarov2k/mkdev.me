@@ -67,6 +67,23 @@ RSpec.describe MovieIndustry::MovieCollection do
     end
   end
 
+  describe '#each' do
+    subject(:each) { movie_collection.each { |m| arr << m.year } }
+
+    let!(:arr) { [] }
+
+    it {
+      each
+      expect(arr).to match_array([1994, 1972, 1974, 2008, 1957])
+    }
+  end
+
+  describe '#map' do
+    subject { movie_collection.map(&:year) }
+
+    it { is_expected.to match_array([1994, 1972, 1974, 2008, 1957]) }
+  end
+
   describe '#sort_by' do
     context 'when call with symbol' do
       subject(:sorted) { movie_collection.sort_by(:year) }

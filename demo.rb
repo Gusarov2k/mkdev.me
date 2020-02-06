@@ -2,15 +2,12 @@ require 'date'
 require 'csv'
 require 'ostruct'
 require 'pry'
-require './lib/movie.rb'
-# require './lib/modules/cashbox.rb'
-Dir['./lib/*_movie.rb'].sort.each { |file| require file }
-Dir['./lib/*.rb'].sort.each { |file| require file }
+require 'money'
+require './lib/movie_industry/movie.rb'
+Dir['./lib/**/*.rb'].sort.each { |file| require file }
 
 file_name = ARGV.first || 'movies.txt'
-movies = MovieCollection.new(file_name)
-# theatre = Theatre.new(movies)
-# binding.pry
+movies = MovieIndustry::MovieCollection.new(file_name)
 
 puts '# 5 movies with maximum duration selecting with symbol'
 puts movies.sort_by(:duration).last(5)
@@ -56,3 +53,35 @@ begin
 rescue StandardError => e
   puts "Got error: #{e.message}"
 end
+
+puts "\n# Let's see to a offline Theatre"
+theatre = MovieIndustry::Theatre.new(movies)
+puts "\n# By ticket to Terminator"
+begin
+  theatre.buy_ticket('The Terminator')
+rescue StandardError => e
+  puts "Got error: #{e.message}"
+end
+
+puts "\n# Ooook. How about Godfather?"
+theatre.buy_ticket('The Godfather')
+
+puts "\n# And theatre cash now: #{theatre.cash.format}"
+
+puts "\n# Good! Let's see to our Netflix"
+netflix1 = MovieIndustry::Netflix.new(movies)
+
+puts "\n# Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+
+netflix1.pay(Money.new(100_00, 'USD'))
+puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+
+netflix2 = MovieIndustry::Netflix.new(movies)
+puts "\n# Netflix balanse is still #{MovieIndustry::Netflix.cash.format}"
+
+netflix3 = MovieIndustry::Netflix.new(movies, Money.new(1000, 'USD'))
+puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+
+netflix2.show(genre: 'Comedy', period: /Ancient/)
+netflix3.show(genre: 'Crime', period: /New/)
+puts "\n# And finaly Netflix balanse is #{MovieIndustry::Netflix.cash.format}"

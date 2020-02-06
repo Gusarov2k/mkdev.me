@@ -2,6 +2,10 @@ RSpec.describe Theatre do
   let(:movie_collection) { MovieCollection.new('./spec/fixtures/theatre_movies.txt') }
   let(:theatre)          { described_class.new(movie_collection) }
 
+  describe '.new' do
+    it { expect(described_class.new(movie_collection).cash).to eq Money.new(0, 'USD') }
+  end
+
   describe '#show' do
     subject(:show) { theatre.show }
 
@@ -45,6 +49,34 @@ RSpec.describe Theatre do
       it {
         expect { theatre.when?('Not existing movie') }.to raise_error(RuntimeError, "There is no 'Not existing movie' found")
       }
+    end
+  end
+
+  describe '#buy_ticket' do
+    subject(:buy) { theatre.buy_ticket('Ancient Crime') }
+
+    it { expect { buy }.to output("You buy ticket to 'Ancient Crime'\n").to_stdout }
+
+    context 'when movie in morning shedule' do
+      it { expect { buy }.to change(theatre, :cash).by(Money.new(300, 'USD')) }
+    end
+
+    context 'when movie in day shedule' do
+      subject(:buy) { theatre.buy_ticket('Modern Comedy') }
+
+      it { expect { buy }.to change(theatre, :cash).by(Money.new(500, 'USD')) }
+    end
+
+    context 'when movie in evening shedule' do
+      subject(:buy) { theatre.buy_ticket('New Film') }
+
+      it { expect { buy }.to change(theatre, :cash).by(Money.new(1000, 'USD')) }
+    end
+
+    context 'when movie not in shedule' do
+      subject(:buy) { theatre.buy_ticket('The Terminator') }
+
+      it { expect { buy }.to raise_error(RuntimeError, "There is no 'The Terminator' in actual shedule") }
     end
   end
 end

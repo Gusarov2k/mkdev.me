@@ -1,5 +1,5 @@
-RSpec.describe Netflix do
-  let(:movie_collection) { MovieCollection.new('./spec/fixtures/netflix_movies.txt') }
+RSpec.describe MovieIndustry::Netflix do
+  let(:movie_collection) { MovieIndustry::MovieCollection.new('./spec/fixtures/netflix_movies.txt') }
   let(:netflix)          { described_class.new(movie_collection) }
 
   before do

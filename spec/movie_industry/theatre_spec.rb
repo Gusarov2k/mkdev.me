@@ -1,5 +1,5 @@
-RSpec.describe Theatre do
-  let(:movie_collection) { MovieCollection.new('./spec/fixtures/theatre_movies.txt') }
+RSpec.describe MovieIndustry::Theatre do
+  let(:movie_collection) { MovieIndustry::MovieCollection.new('./spec/fixtures/theatre_movies.txt') }
   let(:theatre)          { described_class.new(movie_collection) }
 
   describe '.new' do

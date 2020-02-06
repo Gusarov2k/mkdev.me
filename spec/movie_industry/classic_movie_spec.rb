@@ -1,4 +1,4 @@
-RSpec.describe ClassicMovie do
+RSpec.describe MovieIndustry::ClassicMovie do
   describe '#to_s' do
     subject { movie.to_s }
 

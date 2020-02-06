@@ -2,10 +2,7 @@ RSpec.describe MovieIndustry::Netflix do
   let(:movie_collection) { MovieIndustry::MovieCollection.new('./spec/fixtures/netflix_movies.txt') }
   let(:netflix)          { described_class.new(movie_collection) }
 
-  before do
-    described_class.setup_cashbox
-    described_class.take('Bank')
-  end
+  before { described_class.take('Bank') }
 
   describe '.new' do
     context 'when initial balance not set' do

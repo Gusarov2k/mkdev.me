@@ -168,6 +168,16 @@ RSpec.describe MovieIndustry::MovieCollection do
 
       it { is_expected.to be_a_array_of(MovieIndustry::NewMovie) }
     end
+
+    context 'when Proc given' do
+      subject(:list) { movie_collection.filter(arg) }
+
+      let(:arg) { proc { |m| m.genre.include?('Crime') && m.year < 1995 && m.title.include?('The Shawshank') } }
+
+      it 'Select The Shawshank Redemption Movie' do
+        expect(list.first).to have_attributes(movie_params)
+      end
+    end
   end
 
   describe '#stats' do

@@ -24,7 +24,6 @@ module MovieIndustry
 
     def initialize(movie_collection)
       @movie_collection = movie_collection
-      setup_cashbox
     end
 
     def show

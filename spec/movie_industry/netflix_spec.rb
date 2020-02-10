@@ -104,5 +104,18 @@ RSpec.describe MovieIndustry::Netflix do
 
       it { expect { show }.to raise_error(RuntimeError, 'There is not enough money. Your balance $0.30') }
     end
+
+    context 'when block given' do
+      subject(:show) { netflix.show { |m| m.genre.include?('Crime') && m.year > 2006 && m.title.include?('New Film') } }
+
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
+
+      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
+
+      it {
+        expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
+      }
+    end
   end
 end

@@ -30,9 +30,9 @@ module MovieIndustry
       PRICE.fetch(movie.class)
     end
 
-    def show(**params)
+    def show(**params, &block)
       time = Time.now
-      movie, price, movie_final_at = prepare_movie(time, **params)
+      movie, price, movie_final_at = prepare_movie(time, **params, &block)
       raise "There is not enough money. Your balance $#{@client_balance}" if @client_balance < price
 
       puts "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
@@ -42,8 +42,9 @@ module MovieIndustry
 
     private
 
-    def prepare_movie(time, **params)
-      movie = movie_collection.filter(params).first
+    def prepare_movie(time, **params, &block)
+      filter = block_given? ? block : params
+      movie = movie_collection.filter(filter).first
       price = how_much?(movie.title)
       movie_final_at = (time + movie.duration * 60)
 

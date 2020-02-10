@@ -138,5 +138,26 @@ RSpec.describe MovieIndustry::Netflix do
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
       }
     end
+
+    context 'when user filter with argument' do
+      subject(:show) { netflix.show(new_crime: 2006) }
+
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
+
+      before do
+        netflix.define_filter(:new_crime) do |m, y|
+          m.genre.include?('Crime') &&
+            m.year > y &&
+            m.title.include?('New Film')
+        end
+      end
+
+      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
+      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
+
+      it {
+        expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
+      }
+    end
   end
 end

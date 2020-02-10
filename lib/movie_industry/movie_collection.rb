@@ -41,10 +41,10 @@ module MovieIndustry
       @movies.select { |m| m.send(key.to_s).include?(val) }
     end
 
-    def filter(arg)
-      return @movies.select { |m| arg.call(m) } if arg.is_a?(Proc)
+    def filter(filter, arg = nil)
+      return @movies.select { |m| filter.call(m, arg) } if filter.is_a?(Proc)
 
-      arg.each_pair.inject(@movies) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }
+      filter.each_pair.inject(@movies) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }
     end
 
     def stats(arg)

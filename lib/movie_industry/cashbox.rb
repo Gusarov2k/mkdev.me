@@ -17,7 +17,7 @@ module MovieIndustry
     def take(who = nil)
       raise 'This is a Robbery!' unless who == 'Bank'
 
-      @cash = Money.new(0)
+      @cash = setup_money
     end
   end
 end

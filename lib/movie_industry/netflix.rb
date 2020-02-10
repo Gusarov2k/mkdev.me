@@ -15,6 +15,7 @@ module MovieIndustry
     def initialize(movie_collection, client_balance = Money.new(0, 'USD'))
       @movie_collection = movie_collection
       @client_balance = setup_money + client_balance
+      @user_filters = {}
     end
 
     def pay(amount)
@@ -40,15 +41,27 @@ module MovieIndustry
       @client_balance -= price
     end
 
+    def define_filter(name, &block)
+      @user_filters[name] = block
+    end
+
     private
 
     def prepare_movie(time, **params, &block)
-      filter = block_given? ? block : params
+      filter = prepare_filter(params, &block)
       movie = movie_collection.filter(filter).first
       price = how_much?(movie.title)
       movie_final_at = (time + movie.duration * 60)
 
       [movie, price, movie_final_at]
+    end
+
+    def prepare_filter(params, &block)
+      key, val = params.each_pair.first
+      user_filter = @user_filters[key]
+      return user_filter if user_filter && val
+
+      block_given? ? block : params
     end
   end
 end

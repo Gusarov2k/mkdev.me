@@ -77,7 +77,7 @@ netflix1.pay(Money.new(100_00, 'USD'))
 puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
 puts "\n# But client1 balanse is #{netflix1.client_balance.format}"
 
-netflix2 = MovieIndustry::Netflix.new(movies)
+netflix2 = MovieIndustry::Netflix.new(movies, Money.new(1000, 'USD'))
 puts "\n# Netflix balanse is still #{MovieIndustry::Netflix.cash.format}"
 
 netflix3 = MovieIndustry::Netflix.new(movies, Money.new(1000, 'USD'))
@@ -87,6 +87,11 @@ puts "\n# But client3 balanse is #{netflix3.client_balance.format}"
 netflix2.pay(Money.new(10_00, 'USD'))
 puts "\n# Now Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
 puts "\n# But client2 balanse is #{netflix1.client_balance.format}"
+
+netflix2.show { |movie| movie.genre.include?('Action') && movie.year < 2003 }
+netflix2.define_filter(:new_sci_fi) { |movie, year| movie.genre.include?('Action') && movie.year < year }
+netflix2.define_filter(:newest_sci_fi, from: :new_sci_fi, arg: 2010)
+netflix2.show(newest_sci_fi: true)
 
 netflix2.show(genre: 'Comedy', period: /Ancient/)
 netflix3.show(genre: 'Crime', period: /New/)

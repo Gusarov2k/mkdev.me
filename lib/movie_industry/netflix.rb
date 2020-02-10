@@ -41,8 +41,9 @@ module MovieIndustry
       @client_balance -= price
     end
 
-    def define_filter(name, &block)
-      @user_filters[name] = block
+    def define_filter(name, from: nil, arg: nil, &block)
+      code = from ? @user_filters.fetch(from) : block
+      @user_filters[name] = arg ? proc { |m| code.call(m, arg) } : code
     end
 
     private

@@ -170,9 +170,19 @@ RSpec.describe MovieIndustry::MovieCollection do
     end
 
     context 'when Proc given' do
-      subject(:list) { movie_collection.filter(arg) }
+      subject(:list) { movie_collection.filter(filter) }
 
-      let(:arg) { proc { |m| m.genre.include?('Crime') && m.year < 1995 && m.title.include?('The Shawshank') } }
+      let(:filter) { proc { |m| m.genre.include?('Crime') && m.year < 1995 && m.title.include?('The Shawshank') } }
+
+      it 'Select The Shawshank Redemption Movie' do
+        expect(list.first).to have_attributes(movie_params)
+      end
+    end
+
+    context 'when Proc with params given' do
+      subject(:list) { movie_collection.filter(filter, 1995) }
+
+      let(:filter) { proc { |m, y| m.genre.include?('Crime') && m.year < y && m.title.include?('The Shawshank') } }
 
       it 'Select The Shawshank Redemption Movie' do
         expect(list.first).to have_attributes(movie_params)

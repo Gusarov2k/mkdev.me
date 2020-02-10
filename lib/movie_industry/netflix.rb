@@ -48,8 +48,8 @@ module MovieIndustry
     private
 
     def prepare_movie(time, **params, &block)
-      filter = prepare_filter(params, &block)
-      movie = movie_collection.filter(filter).first
+      filter, arg = prepare_filter(params, &block)
+      movie = movie_collection.filter(filter, arg).first
       price = how_much?(movie.title)
       movie_final_at = (time + movie.duration * 60)
 
@@ -57,9 +57,9 @@ module MovieIndustry
     end
 
     def prepare_filter(params, &block)
-      key, val = params.each_pair.first
-      user_filter = @user_filters[key]
-      return user_filter if user_filter && val
+      key, arg = params.each_pair.first
+      filter = @user_filters[key]
+      return filter, arg if filter && arg
 
       block_given? ? block : params
     end

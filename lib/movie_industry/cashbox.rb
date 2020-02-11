@@ -1,11 +1,11 @@
 module MovieIndustry
   module Cashbox
     require 'money'
-    require_relative './cashbox/setup_money'
-    include SetupMoney
+    Money.locale_backend = :currency
+    Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
 
     def cash
-      @cash.nil? ? @cash = setup_money : @cash
+      @cash ||= Money.new(0, 'USD')
     end
 
     def enroll(amount)
@@ -17,7 +17,7 @@ module MovieIndustry
     def take(who = nil)
       raise 'This is a Robbery!' unless who == 'Bank'
 
-      @cash = setup_money
+      @cash = Money.new(0, 'USD')
     end
   end
 end

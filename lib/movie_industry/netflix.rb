@@ -1,7 +1,6 @@
 module MovieIndustry
   class Netflix
     extend Cashbox
-    include Cashbox::SetupMoney
 
     PRICE = {
       AncientMovie => Money.new(100, 'USD'),
@@ -14,7 +13,7 @@ module MovieIndustry
 
     def initialize(movie_collection, client_balance = Money.new(0, 'USD'))
       @movie_collection = movie_collection
-      @client_balance = setup_money + client_balance
+      @client_balance = client_balance
       @user_filters = {}
     end
 

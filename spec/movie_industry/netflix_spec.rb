@@ -110,9 +110,6 @@ RSpec.describe MovieIndustry::Netflix do
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
-      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
-
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
       }
@@ -131,9 +128,6 @@ RSpec.describe MovieIndustry::Netflix do
         end
       end
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
-      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
-
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
       }
@@ -151,9 +145,6 @@ RSpec.describe MovieIndustry::Netflix do
             m.title.include?('New Film')
         end
       end
-
-      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
-      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
 
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
@@ -175,11 +166,36 @@ RSpec.describe MovieIndustry::Netflix do
         netflix.define_filter(:newest_crime, from: :new_crime, arg: 2006)
       end
 
-      it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
-      it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }
-
       it {
         expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 15:00-17:22\n").to_stdout
+      }
+    end
+
+    context 'when user and standart filters given' do
+      subject(:show) { netflix.show(new_crime: true, title: 'New Film 3') }
+
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
+
+      before do
+        netflix.define_filter(:new_crime) { |m| m.genre.include?('Crime') && m.year > 2006 }
+      end
+
+      it {
+        expect { show }.to output("Now showing: New Film 3 - new movie, released 2 years ago! 15:00-17:22\n").to_stdout
+      }
+    end
+
+    context 'when user and standart filters given plus block' do
+      subject(:show) { netflix.show(new_crime: true, year: 2009) { |m| m.title.include?('New Film 3') } }
+
+      let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
+
+      before do
+        netflix.define_filter(:new_crime) { |m| m.genre.include?('Crime') && m.year > 2006 }
+      end
+
+      it {
+        expect { show }.to output("Now showing: New Film 3 - new movie, released 2 years ago! 15:00-17:22\n").to_stdout
       }
     end
   end

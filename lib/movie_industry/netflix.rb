@@ -41,8 +41,13 @@ module MovieIndustry
     end
 
     def define_filter(name, from: nil, arg: nil, &block)
-      code = from ? @user_filters.fetch(from) : block
-      @user_filters[name] = arg ? proc { |m| code.call(m, arg) } : code
+      raise 'Wrong filter setup!' unless from || block_given?
+      raise "From and block can't work together!" if from && block_given?
+
+      return @user_filters[name] = block if block_given?
+
+      parent_filter = @user_filters.fetch(from)
+      @user_filters[name] = proc { |m| parent_filter.call(m, arg) }
     end
 
     private

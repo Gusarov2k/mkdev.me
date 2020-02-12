@@ -41,6 +41,32 @@ RSpec.describe MovieIndustry::Netflix do
     end
   end
 
+  describe '#define_filter' do
+    context 'when from and block together' do
+      subject(:define_filter) { netflix.define_filter(:newest_crime, from: :new_crime) { puts 'example' } }
+
+      let!(:netflix) { described_class.new(movie_collection) }
+
+      it { expect { define_filter }.to raise_error(RuntimeError, "From and block can't work together!") }
+    end
+
+    context 'when inherit from not existing filter' do
+      subject(:define_filter) { netflix.define_filter(:newest_crime, from: :not_existing) }
+
+      let!(:netflix) { described_class.new(movie_collection) }
+
+      it { expect { define_filter }.to raise_error(KeyError, 'key not found: :not_existing') }
+    end
+
+    context 'when call without from or block' do
+      subject(:define_filter) { netflix.define_filter(:newest_crime) }
+
+      let!(:netflix) { described_class.new(movie_collection) }
+
+      it { expect { define_filter }.to raise_error(RuntimeError, 'Wrong filter setup!') }
+    end
+  end
+
   describe '#show' do
     before { Timecop.freeze(Time.new(2011, 1, 15, 15, 0)) }
 

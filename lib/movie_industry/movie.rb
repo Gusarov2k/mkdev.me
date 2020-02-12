@@ -7,10 +7,17 @@ module MovieIndustry
 
     HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
     MOVIE_PERIODS = {
-      1900..1945 => AncientMovie,
-      1945..1968 => ClassicMovie,
-      1968..2000 => ModernMovie,
-      2000.. => NewMovie
+      1900..1945 => :ancient,
+      1945..1968 => :classic,
+      1968..2000 => :modern,
+      2000.. => :new
+    }.freeze
+
+    MOVIE_CLASSES = {
+      ancient: MovieIndustry::AncientMovie,
+      classic: MovieIndustry::ClassicMovie,
+      modern: MovieIndustry::ModernMovie,
+      new: MovieIndustry::NewMovie
     }.freeze
 
     attr_reader(*HEADERS)
@@ -50,7 +57,7 @@ module MovieIndustry
     end
 
     def self.movie_klass(year)
-      MOVIE_PERIODS.find { |k, _v| k === year }&.last || Movie
+      MOVIE_CLASSES[MOVIE_PERIODS.find { |k, _v| k === year }&.last] || Movie
     end
     private_class_method :movie_klass
   end

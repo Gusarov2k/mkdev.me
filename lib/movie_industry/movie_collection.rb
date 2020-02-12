@@ -37,14 +37,14 @@ module MovieIndustry
     def select(arg = nil, &block)
       return super(&block) if block_given?
 
-      key, val = arg.each_pair.first
+      key, val = arg.first
       @movies.select { |m| m.send(key.to_s).include?(val) }
     end
 
     def filter(arg = nil, &block)
       return @movies.select(&block) if block_given?
 
-      arg.each_pair.inject(@movies) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }
+      arg.inject(@movies) { |acc, (key, val)| acc.select { |m| m.matches?(key, val) } }
     end
 
     def stats(arg)

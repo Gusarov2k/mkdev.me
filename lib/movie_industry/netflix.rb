@@ -3,10 +3,10 @@ module MovieIndustry
     extend Cashbox
 
     PRICE = {
-      AncientMovie => Money.new(100, 'USD'),
-      ClassicMovie => Money.new(150, 'USD'),
-      ModernMovie => Money.new(300, 'USD'),
-      NewMovie => Money.new(500, 'USD')
+      Movie::MOVIE_CLASSES[:ancient] => Money.new(100, 'USD'),
+      Movie::MOVIE_CLASSES[:classic] => Money.new(150, 'USD'),
+      Movie::MOVIE_CLASSES[:modern] => Money.new(300, 'USD'),
+      Movie::MOVIE_CLASSES[:new] => Money.new(500, 'USD')
     }.freeze
 
     attr_reader :movie_collection, :client_balance

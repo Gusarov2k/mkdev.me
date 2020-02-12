@@ -48,20 +48,18 @@ module MovieIndustry
     private
 
     def prepare_movie(time, **params, &block)
-      filter, arg = prepare_filter(params, &block)
-      movie = movie_collection.filter(filter, arg).first
+      movie = select_movie(**params, &block)
       price = how_much?(movie.title)
       movie_final_at = (time + movie.duration * 60)
 
       [movie, price, movie_final_at]
     end
 
-    def prepare_filter(params, &block)
-      key, arg = params.each_pair.first
-      filter = @user_filters[key]
-      return filter, arg if filter && arg
-
-      block_given? ? block : params
+    def select_movie(**params, &block)
+      user_filters, standart_filter = params.each_pair.partition { |k, _v| @user_filters[k] }.map(&:to_h)
+      movies = movie_collection.filter(standart_filter)
+      movies = movies.filter(&block) if block_given?
+      user_filters.each_pair.inject(movies) { |acc, (k, v)| acc.filter { |m| @user_filters[k].call(m, v) } }.first
     end
   end
 end

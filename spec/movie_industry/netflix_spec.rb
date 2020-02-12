@@ -186,16 +186,16 @@ RSpec.describe MovieIndustry::Netflix do
     end
 
     context 'when user and standart filters given plus block' do
-      subject(:show) { netflix.show(new_crime: true, year: 2009) { |m| m.title.include?('New Film 3') } }
+      subject(:show) { netflix.show(new_crime: 2006, duration: 143) { |m| m.year == 2009 } }
 
       let!(:netflix) { described_class.new(movie_collection, Money.new(100_00, 'USD')) }
 
       before do
-        netflix.define_filter(:new_crime) { |m| m.genre.include?('Crime') && m.year > 2006 }
+        netflix.define_filter(:new_crime) { |m, y| m.genre.include?('Crime') && m.year > y }
       end
 
       it {
-        expect { show }.to output("Now showing: New Film 3 - new movie, released 2 years ago! 15:00-17:22\n").to_stdout
+        expect { show }.to output("Now showing: New Film 4 - new movie, released 2 years ago! 15:00-17:23\n").to_stdout
       }
     end
   end

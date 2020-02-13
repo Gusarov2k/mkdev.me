@@ -194,7 +194,7 @@ RSpec.describe MovieIndustry::Movie do
         stub_const('MovieIndustry::TestMovie', test_movie)
       end
 
-      it { is_expected.to eq :test }
+      it { is_expected.to eq 'Test' }
     end
   end
 end

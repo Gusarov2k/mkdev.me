@@ -20,13 +20,6 @@ module MovieIndustry
       new: MovieIndustry::NewMovie
     }.freeze
 
-    PERIOD_KEY = {
-      /Ancient/ => :ancient,
-      /Classic/ => :classic,
-      /Modern/ => :modern,
-      /New/ => :new
-    }.freeze
-
     attr_reader(*HEADERS)
     attr_reader :movie_collection
 
@@ -56,16 +49,11 @@ module MovieIndustry
     end
 
     def period
-      instance_of?(Movie) ? :any : self.class.to_s.gsub(/MovieIndustry::/, '').gsub(/Movie/, '').downcase.to_sym
+      instance_of?(Movie) ? :any : self.class.to_s.gsub(/MovieIndustry::/, '').gsub(/Movie/, '') # .downcase.to_sym
     end
 
     def self.create(collection, params)
       movie_klass(params[:year]).new(collection, params)
-    end
-
-    def self.convert_periods(params)
-      params[:period] = PERIOD_KEY.fetch(params[:period]) if params.key?(:period)
-      params # TODO: find some nice method 4 update hash
     end
 
     def self.movie_klass(year)

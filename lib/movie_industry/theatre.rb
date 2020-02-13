@@ -3,7 +3,7 @@ module MovieIndustry
     include Cashbox
 
     SCHEDULE_RULES = {
-      morning: { period: /Ancient/ },
+      morning: { period: :ancient },
       day: { genre: /Comedy|Adventure/ },
       evening: { genre: /Drama|Horror/ }
     }.freeze

@@ -14,10 +14,10 @@ module MovieIndustry
     }.freeze
 
     MOVIE_CLASSES = {
-      ancient: MovieIndustry::AncientMovie,
-      classic: MovieIndustry::ClassicMovie,
-      modern: MovieIndustry::ModernMovie,
-      new: MovieIndustry::NewMovie
+      ancient: AncientMovie,
+      classic: ClassicMovie,
+      modern: ModernMovie,
+      new: NewMovie
     }.freeze
 
     attr_reader(*HEADERS)
@@ -49,7 +49,7 @@ module MovieIndustry
     end
 
     def period
-      instance_of?(Movie) ? :any : self.class.to_s.gsub(/MovieIndustry::/, '').gsub(/Movie/, '')
+      instance_of?(Movie) ? :any : self.class.to_s.gsub(/MovieIndustry::/, '').gsub(/Movie/, '').downcase.to_sym
     end
 
     def self.create(collection, params)

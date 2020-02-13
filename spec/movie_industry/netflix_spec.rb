@@ -73,7 +73,7 @@ RSpec.describe MovieIndustry::Netflix do
     before { Timecop.freeze(Time.new(2011, 1, 15, 15, 0)) }
 
     context 'when AncientMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: /Ancient/) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: :ancient) }
 
       it { expect { show }.to change(described_class, :cash).by(Money.new(100, 'USD')) }
       it { expect { show }.to change(netflix, :client_balance).by(Money.new(-100, 'USD')) }
@@ -81,7 +81,7 @@ RSpec.describe MovieIndustry::Netflix do
     end
 
     context 'when ClassicMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: /Classic/) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: :classic) }
 
       it { expect { show }.to change(described_class, :cash).by(Money.new(150, 'USD')) }
       it { expect { show }.to change(netflix, :client_balance).by(Money.new(-150, 'USD')) }
@@ -94,7 +94,7 @@ RSpec.describe MovieIndustry::Netflix do
     end
 
     context 'when ModernMovie' do
-      subject(:show) { netflix.show(genre: 'Comedy', period: /Modern/) }
+      subject(:show) { netflix.show(genre: 'Comedy', period: :modern) }
 
       it { expect { show }.to change(described_class, :cash).by(Money.new(300, 'USD')) }
       it { expect { show }.to change(netflix, :client_balance).by(Money.new(-300, 'USD')) }
@@ -107,7 +107,7 @@ RSpec.describe MovieIndustry::Netflix do
     end
 
     context 'when NewMovie' do
-      subject(:show) { netflix.show(genre: 'Crime', period: /New/) }
+      subject(:show) { netflix.show(genre: 'Crime', period: :new) }
 
       it { expect { show }.to change(described_class, :cash).by(Money.new(500, 'USD')) }
       it { expect { show }.to change(netflix, :client_balance).by(Money.new(-500, 'USD')) }

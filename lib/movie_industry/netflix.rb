@@ -3,10 +3,10 @@ module MovieIndustry
     extend Cashbox
 
     PRICE = {
-      /Ancient/ => Money.new(100, 'USD'),
-      /Classic/ => Money.new(150, 'USD'),
-      /Modern/ => Money.new(300, 'USD'),
-      /New/ => Money.new(500, 'USD')
+      ancient: Money.new(100, 'USD'),
+      classic: Money.new(150, 'USD'),
+      modern: Money.new(300, 'USD'),
+      new: Money.new(500, 'USD')
     }.freeze
 
     attr_reader :movie_collection, :client_balance
@@ -27,7 +27,7 @@ module MovieIndustry
       movie = movie_collection.filter(title: title).first
       raise "There is no '#{title}' found" unless movie
 
-      PRICE.find { |k, _v| k === movie.period }&.last
+      PRICE.fetch(movie.period)
     end
 
     def show(**params, &block)

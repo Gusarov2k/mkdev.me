@@ -58,7 +58,6 @@ module MovieIndustry
 
     def choose_movie(time)
       filter = SCHEDULE_RULES.fetch(operating_mode(time.hour))
-      filter = Movie.convert_periods(filter)
       movie_collection.filter(filter).sample
     end
 

@@ -3,10 +3,10 @@ module MovieIndustry
     extend Cashbox
 
     PRICE = {
-      Movie::MOVIE_CLASSES[:ancient] => Money.new(100, 'USD'),
-      Movie::MOVIE_CLASSES[:classic] => Money.new(150, 'USD'),
-      Movie::MOVIE_CLASSES[:modern] => Money.new(300, 'USD'),
-      Movie::MOVIE_CLASSES[:new] => Money.new(500, 'USD')
+      ancient: Money.new(100, 'USD'),
+      classic: Money.new(150, 'USD'),
+      modern: Money.new(300, 'USD'),
+      new: Money.new(500, 'USD')
     }.freeze
 
     attr_reader :movie_collection, :client_balance
@@ -27,7 +27,7 @@ module MovieIndustry
       movie = movie_collection.filter(title: title).first
       raise "There is no '#{title}' found" unless movie
 
-      PRICE.fetch(movie.class)
+      PRICE.fetch(movie.period)
     end
 
     def show(**params, &block)
@@ -61,7 +61,8 @@ module MovieIndustry
     end
 
     def filter(**params, &block)
-      user_filters, standart_filter = params.partition { |k, _v| @user_filters.key?(k) }.map(&:to_h)
+      args = Movie.convert_periods(params)
+      user_filters, standart_filter = args.partition { |k, _v| @user_filters.key?(k) }.map(&:to_h)
       movies = movie_collection.filter(standart_filter)
       movies = movies.filter(&block) if block_given?
       user_filters.inject(movies) { |acc, (k, v)| acc.select { |m| @user_filters[k].call(m, v) } }

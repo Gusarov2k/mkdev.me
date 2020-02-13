@@ -187,14 +187,14 @@ RSpec.describe MovieIndustry::Movie do
     it { is_expected.to eq :any }
 
     context 'when inherit from Movie' do
-      let(:movie) { TestMovie.new(movie_collection) }
+      let(:movie) { MovieIndustry::TestMovie.new(movie_collection) }
 
       before do
         test_movie = Class.new(described_class)
-        stub_const('TestMovie', test_movie)
+        stub_const('MovieIndustry::TestMovie', test_movie)
       end
 
-      it { is_expected.to eq 'Test' }
+      it { is_expected.to eq :test }
     end
   end
 end

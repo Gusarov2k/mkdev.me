@@ -1,11 +1,24 @@
 module MovieIndustry
-  class Movie
+  class Movie < Dry::Struct
     require_relative 'ancient_movie'
     require_relative 'classic_movie'
     require_relative 'modern_movie'
     require_relative 'new_movie'
+    require_relative 'movie_collection'
 
-    HEADERS = %i[imdb_link title year country release_at genre duration rate director star_actors].freeze
+    HEADERS = {
+      imdb_link: Types::Coercible::String,
+      title: Types::Coercible::String,
+      year: Types::Coercible::Integer,
+      country: Types::Coercible::String,
+      release_at: Types::Params::Date,
+      genre: Types::Array.of(Types::Coercible::String),
+      duration: Types::Coercible::Integer,
+      rate: Types::Coercible::String,
+      director: Types::Coercible::String,
+      star_actors: Types::Array.of(Types::Coercible::String)
+    }.freeze
+
     MOVIE_PERIODS = {
       1900..1945 => :ancient,
       1945..1968 => :classic,
@@ -20,13 +33,8 @@ module MovieIndustry
       new: NewMovie
     }.freeze
 
-    attr_reader(*HEADERS)
-    attr_reader :movie_collection
-
-    def initialize(movie_collection, **params)
-      @movie_collection = movie_collection
-      params.each { |key, value| instance_variable_set("@#{key}", value) }
-    end
+    HEADERS.each { |k, v| attribute? k, v }
+    attribute? :movie_collection, Types.Instance(MovieIndustry::MovieCollection)
 
     def to_s
       "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
@@ -53,7 +61,7 @@ module MovieIndustry
     end
 
     def self.create(collection, params)
-      movie_klass(params[:year]).new(collection, params)
+      movie_klass(params[:year]).new(params.merge(movie_collection: collection))
     end
 
     def self.movie_klass(year)

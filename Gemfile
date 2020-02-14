@@ -2,6 +2,9 @@ source 'https://rubygems.org'
 
 ruby '~>2.6'
 
+gem 'dry-struct'
+gem 'dry-types'
+
 gem 'money'
 gem 'require_all'
 

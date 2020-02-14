@@ -3,6 +3,10 @@ require 'csv'
 require 'ostruct'
 require 'pry'
 require 'money'
+require 'rubygems'
+require 'bundler/setup'
+Bundler.require(:default, :test, :development)
+require './lib/movie_industry/types.rb'
 require './lib/movie_industry/movie.rb'
 Dir['./lib/**/*.rb'].sort.each { |file| require file }
 

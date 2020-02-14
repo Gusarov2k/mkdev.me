@@ -14,9 +14,11 @@ module MovieIndustry
       end
     }
 
-    def initialize(file_name)
-      csv = CSV.read(file_name, col_sep: '|', headers: Movie::HEADERS, converters: :imdb_list_converter)
-      @movies = csv.map { |row| Movie.create(self, row.to_h) }
+    def initialize(file_name = nil)
+      if file_name
+        csv = CSV.read(file_name, col_sep: '|', headers: Movie::HEADERS.keys, converters: :imdb_list_converter)
+        @movies = csv.map { |row| Movie.create(self, row.to_h) }
+      end
       @file_name = file_name
     end
 

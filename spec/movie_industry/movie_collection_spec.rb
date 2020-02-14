@@ -31,6 +31,19 @@ RSpec.describe MovieIndustry::MovieCollection do
 
       it { expect { new }.to raise_error(Errno::ENOENT) }
     end
+
+    context 'when no file_name given' do
+      subject(:new) { described_class.new }
+
+      let(:csv)         { class_spy('CSV') }
+      let(:movie_class) { class_spy('MovieIndustry::Movie') }
+
+      it 'not parse csv-file and not create Movie objects' do
+        expect(csv).not_to have_received(:read)
+        expect(movie_class).not_to have_received(:create)
+        new
+      end
+    end
   end
 
   describe '#all' do

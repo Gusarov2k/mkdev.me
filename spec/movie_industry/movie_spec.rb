@@ -1,6 +1,6 @@
 RSpec.describe MovieIndustry::Movie do
-  let(:movie)            { described_class.new(movie_collection, params) }
-  let(:movie_collection) { double }
+  let(:movie)            { described_class.new(params) }
+  let(:movie_collection) { MovieIndustry::MovieCollection.new }
   let(:existing_genres)  { %w[Crime Drama Action] }
   let(:params) do
     {
@@ -13,7 +13,8 @@ RSpec.describe MovieIndustry::Movie do
       duration: 142,
       rate: '9.3',
       director: 'Frank Darabont',
-      star_actors: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton']
+      star_actors: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton'],
+      movie_collection: movie_collection
     }
   end
 
@@ -23,7 +24,7 @@ RSpec.describe MovieIndustry::Movie do
   end
 
   describe '.new' do
-    subject { described_class.new(movie_collection, params) }
+    subject { described_class.new(params) }
 
     context 'when all good' do
       it { is_expected.to be_an_instance_of(described_class) }
@@ -63,7 +64,7 @@ RSpec.describe MovieIndustry::Movie do
     end
 
     context 'when movie year not set' do
-      let(:params) { { year: nil } }
+      let(:params) { {} }
 
       it { is_expected.to be_an_instance_of(described_class) }
     end
@@ -187,7 +188,7 @@ RSpec.describe MovieIndustry::Movie do
     it { is_expected.to eq :any }
 
     context 'when inherit from Movie' do
-      let(:movie) { MovieIndustry::TestMovie.new(movie_collection) }
+      let(:movie) { MovieIndustry::TestMovie.new }
 
       before do
         test_movie = Class.new(described_class)

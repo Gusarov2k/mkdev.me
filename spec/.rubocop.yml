@@ -6,8 +6,8 @@ Metrics/BlockLength:
 RSpec/ExampleLength:
   Max: 10
 
-RSpec/MultipleExpectations:
-  Max: 2
+# RSpec/MultipleExpectations:
+#   Max: 2
 
 Layout/LineLength:
   Enabled: false

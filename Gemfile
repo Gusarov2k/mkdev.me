@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby '~>2.6'
 
-gem 'dry-struct'
+gem 'dry-initializer'
 gem 'dry-types'
 
 gem 'money'

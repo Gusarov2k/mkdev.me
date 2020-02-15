@@ -8,31 +8,18 @@ RSpec.describe MovieIndustry::Movie do
       title: 'The Shawshank Redemption',
       year: 1994,
       country: 'USA',
-      release_at: Date.new(1994, 10, 14),
-      genre: %w[Crime Drama],
-      duration: 142,
+      release_at: '1994-10-14',
+      genre: 'Crime,Drama',
+      duration: '142 min',
       rate: '9.3',
       director: 'Frank Darabont',
-      star_actors: ['Tim Robbins', 'Morgan Freeman', 'Bob Gunton']
+      star_actors: 'Tim Robbins,Morgan Freeman,Bob Gunton'
     }
   end
 
   before do
     allow(movie_collection).to receive(:file_name).and_return('movies.txt')
     allow(movie_collection).to receive(:existing_genres).and_return(existing_genres)
-  end
-
-  describe '.new' do
-    subject { described_class.new(movie_collection, params) }
-
-    context 'when all good' do
-      it { is_expected.to be_an_instance_of(described_class) }
-      its(:movie_collection) { is_expected.to eq movie_collection }
-
-      it 'creates movie instance with methods from all valid params' do
-        expect(movie).to have_attributes(params)
-      end
-    end
   end
 
   describe '.create' do

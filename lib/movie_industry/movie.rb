@@ -20,16 +20,16 @@ module MovieIndustry
       new: NewMovie
     }.freeze
 
-    option :imdb_link, Types::Coercible::String, optional: true, dafault: proc { nil }
-    option :title, Types::Coercible::String, optional: true, dafault: proc { nil }
-    option :year, Types::Coercible::Integer, optional: true, dafault: proc { nil }
-    option :country, Types::Coercible::String, optional: true, dafault: proc { nil }
-    option :release_at, Types::Params::Date, optional: true, dafault: proc { nil }
-    option :genre, Types::Array.of(Types::Coercible::String), optional: true, dafault: proc { nil }
-    option :duration, Types::Coercible::Integer, optional: true, dafault: proc { nil }
-    option :rate, Types::Coercible::String, optional: true, dafault: proc { nil }
-    option :director, Types::Coercible::String, optional: true, dafault: proc { nil }
-    option :star_actors, Types::Array.of(Types::Coercible::String), optional: true, dafault: proc { nil }
+    option :imdb_link, Types::Coercible::String, optional: true
+    option :title, Types::Coercible::String, optional: true
+    option :year, Types::Coercible::Integer, optional: true
+    option :country, Types::Coercible::String, optional: true
+    option :release_at, Types::Params::Date, optional: true, type: proc { |str| date_safe_parse(str) }
+    option :genre, Types::Array.of(Types::Coercible::String), optional: true, type: proc { |str| str.split(',') }
+    option :duration, Types::Coercible::Integer, optional: true, type: proc { |str| str&.slice(/\d+/).to_i }
+    option :rate, Types::Coercible::String, optional: true
+    option :director, Types::Coercible::String, optional: true
+    option :star_actors, Types::Array.of(Types::Coercible::String), optional: true, type: proc { |str| str.split(',') }
     attr_reader :movie_collection
 
     def initialize(movie_collection, **data)
@@ -70,8 +70,17 @@ module MovieIndustry
     end
 
     def self.movie_klass(year)
-      MOVIE_CLASSES[MOVIE_PERIODS.find { |k, _v| k === year }&.last] || Movie
+      MOVIE_CLASSES[MOVIE_PERIODS.find { |k, _v| k === year.to_i }&.last] || Movie
     end
-    private_class_method :movie_klass
+
+    def self.date_safe_parse(str)
+      patern = case str
+               when /\d{4}-\d{2}-\d{2}/ then '%Y-%m-%d'
+               when /\d{4}-\d{2}/       then '%Y-%m'
+               else                          '%Y'
+               end
+      Date.strptime(str, patern)
+    end
+    private_class_method :movie_klass, :date_safe_parse
   end
 end

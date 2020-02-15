@@ -1,22 +1,10 @@
 module MovieIndustry
   class Movie
+    extend Dry::Initializer
     require_relative 'ancient_movie'
     require_relative 'classic_movie'
     require_relative 'modern_movie'
     require_relative 'new_movie'
-
-    HEADERS = {
-      imdb_link: Types::Coercible::String,
-      title: Types::Coercible::String,
-      year: Types::Coercible::Integer,
-      country: Types::Coercible::String,
-      release_at: Types::Params::Date,
-      genre: Types::Array.of(Types::Coercible::String),
-      duration: Types::Coercible::Integer,
-      rate: Types::Coercible::String,
-      director: Types::Coercible::String,
-      star_actors: Types::Array.of(Types::Coercible::String)
-    }.freeze
 
     MOVIE_PERIODS = {
       1900..1945 => :ancient,
@@ -32,7 +20,16 @@ module MovieIndustry
       new: NewMovie
     }.freeze
 
-    include Dry::Initializer.define -> { HEADERS.each { |k, v| option k, v, optional: true, dafault: proc { nil } } }
+    option :imdb_link, Types::Coercible::String, optional: true, dafault: proc { nil }
+    option :title, Types::Coercible::String, optional: true, dafault: proc { nil }
+    option :year, Types::Coercible::Integer, optional: true, dafault: proc { nil }
+    option :country, Types::Coercible::String, optional: true, dafault: proc { nil }
+    option :release_at, Types::Params::Date, optional: true, dafault: proc { nil }
+    option :genre, Types::Array.of(Types::Coercible::String), optional: true, dafault: proc { nil }
+    option :duration, Types::Coercible::Integer, optional: true, dafault: proc { nil }
+    option :rate, Types::Coercible::String, optional: true, dafault: proc { nil }
+    option :director, Types::Coercible::String, optional: true, dafault: proc { nil }
+    option :star_actors, Types::Array.of(Types::Coercible::String), optional: true, dafault: proc { nil }
     attr_reader :movie_collection
 
     def initialize(movie_collection, **data)
@@ -66,6 +63,10 @@ module MovieIndustry
 
     def self.create(collection, params)
       movie_klass(params[:year]).new(collection, params)
+    end
+
+    def self.attributes
+      dry_initializer.definitions
     end
 
     def self.movie_klass(year)

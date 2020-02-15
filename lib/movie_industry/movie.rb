@@ -1,10 +1,9 @@
 module MovieIndustry
-  class Movie < Dry::Struct
+  class Movie
     require_relative 'ancient_movie'
     require_relative 'classic_movie'
     require_relative 'modern_movie'
     require_relative 'new_movie'
-    require_relative 'movie_collection'
 
     HEADERS = {
       imdb_link: Types::Coercible::String,
@@ -33,8 +32,13 @@ module MovieIndustry
       new: NewMovie
     }.freeze
 
-    HEADERS.each { |k, v| attribute? k, v }
-    attribute? :movie_collection, Types.Instance(MovieIndustry::MovieCollection)
+    include Dry::Initializer.define -> { HEADERS.each { |k, v| option k, v, optional: true, dafault: proc { nil } } }
+    attr_reader :movie_collection
+
+    def initialize(movie_collection, **data)
+      super(**data)
+      @movie_collection = movie_collection
+    end
 
     def to_s
       "#{title} (#{release_at}; #{genre.join('/')}) - #{duration} min"
@@ -61,7 +65,7 @@ module MovieIndustry
     end
 
     def self.create(collection, params)
-      movie_klass(params[:year]).new(params.merge(movie_collection: collection))
+      movie_klass(params[:year]).new(collection, params)
     end
 
     def self.movie_klass(year)

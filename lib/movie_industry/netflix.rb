@@ -15,6 +15,7 @@ module MovieIndustry
       @movie_collection = movie_collection
       @client_balance = client_balance
       @user_filters = {}
+      self.class.create_methods(:by_genre, :by_country)
     end
 
     def pay(amount)
@@ -48,6 +49,14 @@ module MovieIndustry
 
       parent_filter = @user_filters.fetch(from)
       @user_filters[name] = proc { |m| parent_filter.call(m, arg) }
+    end
+
+    def self.create_methods(*names)
+      names.each do |name|
+        define_method name do
+          @movie_collection # .sort_by(__method__.to_s.gsub('by_', '').to_sym)
+        end
+      end
     end
 
     private

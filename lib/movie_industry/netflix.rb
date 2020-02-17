@@ -54,7 +54,7 @@ module MovieIndustry
     def self.create_methods(*names)
       names.each do |name|
         define_method name do
-          @movie_collection # .sort_by(__method__.to_s.gsub('by_', '').to_sym)
+          @movie_collection
         end
       end
     end

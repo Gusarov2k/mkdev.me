@@ -203,4 +203,12 @@ RSpec.describe MovieIndustry::Netflix do
       }
     end
   end
+
+  describe '#by_genre' do
+    it { expect(netflix.by_genre).to eq movie_collection }
+  end
+
+  describe '#by_country' do
+    it { expect(netflix.by_country).to eq movie_collection }
+  end
 end

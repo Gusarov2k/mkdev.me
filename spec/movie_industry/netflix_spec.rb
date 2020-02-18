@@ -205,10 +205,10 @@ RSpec.describe MovieIndustry::Netflix do
   end
 
   describe '#by_genre' do
-    it { expect(netflix.by_genre).to eq movie_collection }
+    it { expect(netflix.by_genre).to be_an_instance_of(MovieIndustry::MovieArray) }
   end
 
   describe '#by_country' do
-    it { expect(netflix.by_country).to eq movie_collection }
+    it { expect(netflix.by_country).to be_an_instance_of(MovieIndustry::MovieArray) }
   end
 end

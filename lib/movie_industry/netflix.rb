@@ -54,7 +54,7 @@ module MovieIndustry
     def self.create_methods(*names)
       names.each do |name|
         define_method name do
-          @movie_collection
+          MovieIndustry::MovieArray.new(@movie_collection.all, @movie_collection.existing_genres)
         end
       end
     end

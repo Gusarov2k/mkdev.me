@@ -7,7 +7,6 @@ module MovieIndustry
       csv = CSV.read(file_name, col_sep: '|', headers: Movie.attributes.keys)
       @movies = csv.map { |row| Movie.create(self, row.to_h) }
       @file_name = file_name
-      self.class.create_methods(existing_genres)
     end
 
     def all
@@ -43,24 +42,6 @@ module MovieIndustry
 
     def existing_genres
       @existing_genres ||= @movies.flat_map(&:genre).sort.uniq
-    end
-
-    def method_missing(meth, *args, &block)
-      movies = filter { |movie| /#{meth}/i === movie.country }
-      movies.any? ? movies : super
-    end
-
-    def respond_to_missing?(method, *)
-      @countrys ||= @movies.map { |m| m.country.downcase.gsub(/(-)|( )/, '_') }.uniq.map(&:to_sym)
-      @countrys.include?(method) || super
-    end
-
-    def self.create_methods(names)
-      names.each do |name|
-        define_method name.downcase.gsub(/(-)|( )/, '_') do
-          select(genre: name)
-        end
-      end
     end
   end
 end

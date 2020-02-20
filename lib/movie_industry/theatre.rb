@@ -20,10 +20,37 @@ module MovieIndustry
       evening: Money.new(1000, 'USD')
     }.freeze
 
-    attr_reader :movie_collection
+    attr_reader :movie_collection, :halls, :periods
 
     def initialize(movie_collection)
       @movie_collection = movie_collection
+    end
+
+    def self.new(movie_collection = 'movies.txt', &block)
+      instance = super
+      instance.class.instance_eval(&block) if block_given?
+      instance_variables.each do |var|
+        instance.instance_variable_set(var, instance_variable_get(var))
+      end
+      instance
+    end
+
+    def self.hall(name, **params)
+      @halls ||= {}
+      h = Hall.new(name, **params)
+      @halls[name] = h
+    end
+
+    def self.period(period, &block)
+      @periods ||= {}
+      p = Period.new(period)
+      p.class.class_eval(&block) if block_given?
+      p.copyvars
+      @periods.values.each do |i|
+        raise "Period '#{i.description}' conflicts with '#{p.description}'" if i.intersect?(p)
+      end
+
+      @periods[period] = p
     end
 
     def show

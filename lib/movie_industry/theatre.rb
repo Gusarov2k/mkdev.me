@@ -6,6 +6,7 @@ module MovieIndustry
       morning: { period: :ancient },
       day: { genre: /Comedy|Adventure/ },
       evening: { genre: /Drama|Horror/ },
+      # TODO: Возможно тут proc, еще подумаю
       dsl: :dsl
     }.freeze
 
@@ -19,6 +20,7 @@ module MovieIndustry
       morning: Money.new(300, 'USD'),
       day: Money.new(500, 'USD'),
       evening: Money.new(1000, 'USD'),
+      # TODO: Возможно тут proc, еще подумаю
       dsl: :dsl
     }.freeze
 

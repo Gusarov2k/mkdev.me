@@ -1,55 +1,54 @@
 RSpec.describe MovieIndustry::Theatre do
   let(:movie_collection) { MovieIndustry::MovieCollection.new('./spec/fixtures/theatre_movies.txt') }
   let(:theatre)          { described_class.new(movie_collection) }
+  let(:dsl_theatre) do
+    described_class.new do
+      hall :red, title: 'Красный зал', places: 100
+      hall :blue, title: 'Синий зал', places: 50
+      hall :green, title: 'Зелёный зал (deluxe)', places: 12
 
-  describe '.new' do
-    before do
-      described_class.instance_eval do
-        @periods = {}
-        @halls = {}
+      period '09:00'..'11:00' do
+        description 'Утренний сеанс'
+        filters genre: 'Comedy', year: 1900..1980
+        price 10
+        hall :red, :blue
+      end
+
+      period '11:00'..'16:00' do
+        description 'Спецпоказ'
+        title 'The Terminator'
+        price 50
+        hall :green
+      end
+
+      period '16:00'..'20:00' do
+        description 'Вечерний сеанс'
+        filters genre: %w[Action Drama], year: 2007..Time.now.year
+        price 20
+        hall :red, :blue
+      end
+
+      period '19:00'..'22:00' do
+        description 'Вечерний сеанс для киноманов'
+        filters year: 1900..1945, exclude_country: 'USA'
+        price 30
+        hall :green
       end
     end
+  end
 
+  before do
+    described_class.instance_eval do
+      @periods = {}
+      @halls = {}
+    end
+  end
+
+  describe '.new' do
     it { expect(described_class.new(movie_collection).cash).to eq Money.new(0, 'USD') }
 
     context 'when DSL-config valid' do
-      let(:theatre) do
-        described_class.new do
-          hall :red, title: 'Красный зал', places: 100
-          hall :blue, title: 'Синий зал', places: 50
-          hall :green, title: 'Зелёный зал (deluxe)', places: 12
-
-          period '09:00'..'11:00' do
-            description 'Утренний сеанс'
-            filters genre: 'Comedy', year: 1900..1980
-            price 10
-            hall :red, :blue
-          end
-
-          period '11:00'..'16:00' do
-            description 'Спецпоказ'
-            title 'The Terminator'
-            price 50
-            hall :green
-          end
-
-          period '16:00'..'20:00' do
-            description 'Вечерний сеанс'
-            filters genre: %w[Action Drama], year: 2007..Time.now.year
-            price 20
-            hall :red, :blue
-          end
-
-          period '19:00'..'22:00' do
-            description 'Вечерний сеанс для киноманов'
-            filters year: 1900..1945, exclude_country: 'USA'
-            price 30
-            hall :green
-          end
-        end
-      end
-
-      it { expect(theatre).to be_an_instance_of(described_class) }
+      it { expect(dsl_theatre).to be_an_instance_of(described_class) }
     end
 
     describe 'when DSL-config has periods conflict' do
@@ -110,6 +109,7 @@ RSpec.describe MovieIndustry::Theatre do
       before { Timecop.freeze(Time.new(2011, 1, 15, 11, 0)) }
 
       it { expect { show }.to output(Regexp.union(str1, str2)).to_stdout }
+      # it { show }
     end
 
     context 'when call in the day 12:00-16:00' do
@@ -125,6 +125,14 @@ RSpec.describe MovieIndustry::Theatre do
     end
 
     context 'when call in the night 00:00-4:00' do
+      before { Timecop.freeze(Time.new(2011, 1, 15, 0, 30)) }
+
+      it { expect { show }.to output("Sory, Theatre is closed now.\n").to_stdout }
+    end
+
+    context 'when call in the night 00:00-4:00 for DSL-config' do
+      subject(:show) { dsl_theatre.show }
+
       before { Timecop.freeze(Time.new(2011, 1, 15, 0, 30)) }
 
       it { expect { show }.to output("Sory, Theatre is closed now.\n").to_stdout }

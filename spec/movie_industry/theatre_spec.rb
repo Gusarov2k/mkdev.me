@@ -3,7 +3,101 @@ RSpec.describe MovieIndustry::Theatre do
   let(:theatre)          { described_class.new(movie_collection) }
 
   describe '.new' do
+    before do
+      described_class.instance_eval do
+        @periods = {}
+        @halls = {}
+      end
+    end
+
     it { expect(described_class.new(movie_collection).cash).to eq Money.new(0, 'USD') }
+
+    context 'when DSL-config valid' do
+      let(:theatre) do
+        described_class.new do
+          hall :red, title: 'Красный зал', places: 100
+          hall :blue, title: 'Синий зал', places: 50
+          hall :green, title: 'Зелёный зал (deluxe)', places: 12
+
+          period '09:00'..'11:00' do
+            description 'Утренний сеанс'
+            filters genre: 'Comedy', year: 1900..1980
+            price 10
+            hall :red, :blue
+          end
+
+          period '11:00'..'16:00' do
+            description 'Спецпоказ'
+            title 'The Terminator'
+            price 50
+            hall :green
+          end
+
+          period '16:00'..'20:00' do
+            description 'Вечерний сеанс'
+            filters genre: %w[Action Drama], year: 2007..Time.now.year
+            price 20
+            hall :red, :blue
+          end
+
+          period '19:00'..'22:00' do
+            description 'Вечерний сеанс для киноманов'
+            filters year: 1900..1945, exclude_country: 'USA'
+            price 30
+            hall :green
+          end
+        end
+      end
+
+      it { expect(theatre).to be_an_instance_of(described_class) }
+    end
+
+    describe 'when DSL-config has periods conflict' do
+      let(:theatre_1) do
+        described_class.new do
+          hall :red, title: 'Красный зал', places: 100
+          hall :blue, title: 'Синий зал', places: 50
+
+          period '09:00'..'11:00' do
+            description 'Утренний сеанс'
+            filters genre: 'Comedy', year: 1900..1980
+            price 10
+            hall :red, :blue
+          end
+
+          period '10:00'..'16:00' do
+            description 'Спецпоказ'
+            title 'The Terminator'
+            price 50
+            hall :red
+          end
+        end
+      end
+
+      let(:theatre_2) do
+        described_class.new do
+          hall :red, title: 'Красный зал', places: 100
+          hall :blue, title: 'Синий зал', places: 50
+
+          period '09:00'..'11:00' do
+            description 'Утренний сеанс'
+            filters genre: 'Comedy', year: 1900..1980
+            price 10
+            hall :red, :blue
+          end
+
+          period '08:00'..'16:00' do
+            description 'Утренник'
+            title 'The Terminator'
+            price 50
+            hall :red
+          end
+        end
+      end
+
+      it { expect { theatre_1 }.to raise_error(RuntimeError, "Period 'Утренний сеанс' conflicts with 'Спецпоказ'") }
+      it { expect { theatre_2 }.to raise_error(RuntimeError, "Period 'Утренний сеанс' conflicts with 'Утренник'") }
+    end
   end
 
   describe '#show' do

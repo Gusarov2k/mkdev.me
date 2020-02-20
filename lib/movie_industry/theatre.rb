@@ -5,7 +5,8 @@ module MovieIndustry
     SCHEDULE_RULES = {
       morning: { period: :ancient },
       day: { genre: /Comedy|Adventure/ },
-      evening: { genre: /Drama|Horror/ }
+      evening: { genre: /Drama|Horror/ },
+      dsl: :dsl
     }.freeze
 
     OPERATING_MODE = {
@@ -17,7 +18,8 @@ module MovieIndustry
     PRICE = {
       morning: Money.new(300, 'USD'),
       day: Money.new(500, 'USD'),
-      evening: Money.new(1000, 'USD')
+      evening: Money.new(1000, 'USD'),
+      dsl: :dsl
     }.freeze
 
     attr_reader :movie_collection, :halls, :periods
@@ -26,7 +28,7 @@ module MovieIndustry
       @movie_collection = movie_collection
     end
 
-    def self.new(movie_collection = 'movies.txt', &block)
+    def self.new(movie_collection = MovieIndustry::MovieCollection.new('movies.txt'), &block)
       instance = super
       instance.class.instance_eval(&block) if block_given?
       instance_variables.each do |var|
@@ -58,6 +60,9 @@ module MovieIndustry
     end
 
     def when?(title)
+      # TODO: научить искать по DSL-конфигу
+      return :ask_dsl if dsl_config?
+
       movie = movie_collection.filter(title: title).first
       raise "There is no '#{title}' found" unless movie
 
@@ -68,6 +73,8 @@ module MovieIndustry
       showing_at = when?(title)
       raise "There is no '#{title}' in actual shedule" unless showing_at
 
+      # binding.pry
+      # TODO: научить искать по DSL-конфигу
       price = PRICE.fetch(showing_at)
       puts "You buy ticket to '#{title}'"
       enroll(price)
@@ -76,7 +83,7 @@ module MovieIndustry
     private
 
     def prepare_movie(time)
-      return 'Sory, Theatre is closed now.' unless operating_mode(time.hour)
+      return 'Sory, Theatre is closed now.' unless operating_mode(time)
 
       movie = choose_movie(time)
       movie_final_at = (time + movie.duration * 60)
@@ -84,16 +91,35 @@ module MovieIndustry
     end
 
     def choose_movie(time)
-      filter = SCHEDULE_RULES.fetch(operating_mode(time.hour))
+      filter = SCHEDULE_RULES.fetch(operating_mode(time))
+      filter = prepare_dsl_filter(time) if filter == :dsl
+      # binding.pry
       movie_collection.filter(filter).sample
     end
 
-    def operating_mode(hour)
-      OPERATING_MODE.find { |k, _v| k === hour }&.last
+    def operating_mode(time)
+      return OPERATING_MODE.find { |k, _v| k === time.hour }&.last unless dsl_config?
+
+      periods.values.select { |p| p.include?(time) }.any? ? :dsl : false
     end
 
     def check_movie(movie, filter)
       filter.all? { |k, v| movie.matches?(k, v) }
+    end
+
+    def dsl_config?
+      @halls&.any? && @periods&.any?
+    end
+
+    def prepare_dsl_filter(time)
+      period = periods.values.select { |p| p.include?(time) }.sample
+      if period.title
+        { title: period.title }
+      elsif period.filters
+        period.filters
+      else
+        raise 'Cant filter'
+      end
     end
   end
 end

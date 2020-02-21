@@ -1,23 +1,21 @@
 module MovieIndustry
   class Theatre
-    class Period < DSLThing
+    class Period
       PERIOD_PARAMS = %i[description filters title price hall].freeze
-
-      PERIOD_PARAMS.each { |p| attr_reader p }
       attr_reader :range
 
-      def initialize(period)
+      def initialize(period, &block)
         @range = Range.new(*period.minmax.map { |e| Time.parse(e) })
+        instance_eval(&block) if block_given?
       end
 
-      def self.method_missing(meth, *args, &block)
+      def method_missing(meth, *args, &block)
         return super unless PERIOD_PARAMS.include?(meth)
 
-        args = args.first unless meth == :hall
-        instance_variable_set("@#{meth}", args)
+        args.empty? ? instance_variable_get("@#{meth}") : instance_variable_set("@#{meth}", format_by(meth, args))
       end
 
-      def self.respond_to_missing?(method, *)
+      def respond_to_missing?(method, *)
         PERIOD_PARAMS.include?(method) || super
       end
 
@@ -31,7 +29,29 @@ module MovieIndustry
         @range.include?(time)
       end
 
+      def to_s
+        "#{description}: filters #{filters}, title: #{title}"
+      end
+
       private
+
+      def format_by(meth, args)
+        case meth
+        when :hall then args
+        when :filters then format_filter(args)
+        else args.first
+        end
+      end
+
+      def format_filter(args)
+        filter = args.first
+        if filter[:genre].is_a?(String)
+          filter[:genre] = Regexp.new(filter[:genre])
+        elsif filter[:genre].is_a?(Array)
+          filter[:genre] = Regexp.new(filter[:genre].join('|'))
+        end
+        filter
+      end
 
       def time_intersect?(period)
         return true if include?(period.range.min)

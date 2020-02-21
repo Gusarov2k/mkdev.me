@@ -49,6 +49,8 @@ module MovieIndustry
     end
 
     def matches?(field, pattern)
+      return exclude_country(pattern) if field == :exclude_country
+
       value = send(field)
       value.is_a?(Array) ? value.any?(pattern) : pattern === value
     end
@@ -82,5 +84,11 @@ module MovieIndustry
       Date.strptime(str, patern)
     end
     private_class_method :movie_klass, :date_safe_parse
+
+    private
+
+    def exclude_country(exclude_country)
+      exclude_country != country
+    end
   end
 end

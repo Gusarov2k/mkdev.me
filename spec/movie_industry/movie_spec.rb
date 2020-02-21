@@ -158,6 +158,16 @@ RSpec.describe MovieIndustry::Movie do
         expect(movie.matches?(:duration, (140..150))).to be(true)
       end
     end
+
+    context 'when field is exclude_country' do
+      it 'false if exclude_country eq movie country' do
+        expect(movie.matches?(:exclude_country, 'USA')).to be(false)
+      end
+
+      it 'true if exclude_country NOT eq movie country' do
+        expect(movie.matches?(:exclude_country, 'India')).to be(true)
+      end
+    end
   end
 
   describe '#month' do

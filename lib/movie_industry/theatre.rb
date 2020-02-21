@@ -5,9 +5,7 @@ module MovieIndustry
     SCHEDULE_RULES = {
       morning: { period: :ancient },
       day: { genre: /Comedy|Adventure/ },
-      evening: { genre: /Drama|Horror/ },
-      # TODO: Возможно тут proc, еще подумаю
-      dsl: :dsl
+      evening: { genre: /Drama|Horror/ }
     }.freeze
 
     OPERATING_MODE = {
@@ -19,52 +17,26 @@ module MovieIndustry
     PRICE = {
       morning: Money.new(300, 'USD'),
       day: Money.new(500, 'USD'),
-      evening: Money.new(1000, 'USD'),
-      # TODO: Возможно тут proc, еще подумаю
-      dsl: :dsl
+      evening: Money.new(1000, 'USD')
     }.freeze
 
-    attr_reader :movie_collection, :halls, :periods
+    attr_reader :movie_collection, :config
 
-    def initialize(movie_collection)
-      @movie_collection = movie_collection
-    end
-
-    def self.new(movie_collection = MovieIndustry::MovieCollection.new('movies.txt'), &block)
-      instance = super
-      instance.class.instance_eval(&block) if block_given?
-      instance_variables.each do |var|
-        instance.instance_variable_set(var, instance_variable_get(var))
-      end
-      instance
-    end
-
-    def self.hall(name, **params)
-      @halls ||= {}
-      h = Hall.new(name, **params)
-      @halls[name] = h
-    end
-
-    def self.period(period, &block)
-      @periods ||= {}
-      p = Period.new(period)
-      p.class.class_eval(&block) if block_given?
-      p.copyvars
-      @periods.values.each do |i|
-        raise "Period '#{i.description}' conflicts with '#{p.description}'" if i.intersect?(p)
-      end
-
-      @periods[period] = p
+    def initialize(movie_collection = nil, &block)
+      @movie_collection = movie_collection || MovieCollection.new('movies.txt')
+      @config = ConfigBuilder.new(&block).config if block_given?
     end
 
     def show
-      puts prepare_movie(Time.now)
+      time = Time.now
+      @curent_period = config.period_by_time(time)
+      # puts "curent_period: #{@curent_period}"
+      return 'Sory, Theatre is closed now.' unless @curent_period
+
+      puts prepare_movie(time)
     end
 
     def when?(title)
-      # TODO: научить искать по DSL-конфигу
-      return :ask_dsl if dsl_config?
-
       movie = movie_collection.filter(title: title).first
       raise "There is no '#{title}' found" unless movie
 
@@ -75,8 +47,6 @@ module MovieIndustry
       showing_at = when?(title)
       raise "There is no '#{title}' in actual shedule" unless showing_at
 
-      # binding.pry
-      # TODO: научить искать по DSL-конфигу
       price = PRICE.fetch(showing_at)
       puts "You buy ticket to '#{title}'"
       enroll(price)
@@ -85,43 +55,30 @@ module MovieIndustry
     private
 
     def prepare_movie(time)
-      return 'Sory, Theatre is closed now.' unless operating_mode(time)
-
-      movie = choose_movie(time)
+      movie = choose_movie # (time)
       movie_final_at = (time + movie.duration * 60)
       "Now showing: #{movie} #{time.strftime('%H:%M')}-#{movie_final_at.strftime('%H:%M')}"
     end
 
-    def choose_movie(time)
-      filter = SCHEDULE_RULES.fetch(operating_mode(time))
-      filter = prepare_dsl_filter(time) if filter == :dsl
-      # binding.pry
+    def choose_movie # (_time)
+      # filter = SCHEDULE_RULES.fetch(operating_mode(time))
+      filter = if @curent_period.title
+                 { title: @curent_period.title }
+               elsif @curent_period.filters
+                 @curent_period.filters
+               else
+                 {}
+               end
       movie_collection.filter(filter).sample
     end
 
-    def operating_mode(time)
-      return OPERATING_MODE.find { |k, _v| k === time.hour }&.last unless dsl_config?
-
-      periods.values.select { |p| p.include?(time) }.any? ? :dsl : false
-    end
+    # def operating_mode(time)
+    #   # OPERATING_MODE.find { |k, _v| k === time.hour }&.last
+    #   binding.pry
+    # end
 
     def check_movie(movie, filter)
       filter.all? { |k, v| movie.matches?(k, v) }
-    end
-
-    def dsl_config?
-      @halls&.any? && @periods&.any?
-    end
-
-    def prepare_dsl_filter(time)
-      period = periods.values.select { |p| p.include?(time) }.sample
-      if period.title
-        { title: period.title }
-      elsif period.filters
-        period.filters
-      else
-        raise 'Cant filter'
-      end
     end
   end
 end

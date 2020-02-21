@@ -1,6 +1,6 @@
 module MovieIndustry
   class Theatre
-    class Hall < DSLThing
+    class Hall
       attr_reader :code, :title, :places
 
       def initialize(code, **params)

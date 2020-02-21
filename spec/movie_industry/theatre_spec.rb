@@ -37,13 +37,6 @@ RSpec.describe MovieIndustry::Theatre do
     end
   end
 
-  before do
-    described_class.instance_eval do
-      @periods = {}
-      @halls = {}
-    end
-  end
-
   describe '.new' do
     it { expect(described_class.new(movie_collection).cash).to eq Money.new(0, 'USD') }
 
@@ -109,7 +102,6 @@ RSpec.describe MovieIndustry::Theatre do
       before { Timecop.freeze(Time.new(2011, 1, 15, 11, 0)) }
 
       it { expect { show }.to output(Regexp.union(str1, str2)).to_stdout }
-      # it { show }
     end
 
     context 'when call in the day 12:00-16:00' do
@@ -130,13 +122,13 @@ RSpec.describe MovieIndustry::Theatre do
       it { expect { show }.to output("Sory, Theatre is closed now.\n").to_stdout }
     end
 
-    context 'when call in the night 00:00-4:00 for DSL-config' do
-      subject(:show) { dsl_theatre.show }
-
-      before { Timecop.freeze(Time.new(2011, 1, 15, 0, 30)) }
-
-      it { expect { show }.to output("Sory, Theatre is closed now.\n").to_stdout }
-    end
+    # context 'when call in the night 00:00-4:00 for DSL-config' do
+    #   subject(:show) { dsl_theatre.show }
+    #
+    #   before { Timecop.freeze(Time.new(2011, 1, 15, 0, 30)) }
+    #
+    #   it { expect { show }.to output("Sory, Theatre is closed now.\n").to_stdout }
+    # end
   end
 
   describe '#when?' do

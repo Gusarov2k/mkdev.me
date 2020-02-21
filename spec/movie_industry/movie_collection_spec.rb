@@ -176,6 +176,12 @@ RSpec.describe MovieIndustry::MovieCollection do
         expect(list.first).to have_attributes(movie_params)
       end
     end
+
+    context 'when filter with exclude_country:' do
+      subject(:list) { movie_collection.filter(exclude_country: 'USA') }
+
+      it { expect(list.map(&:country)).not_to include('USA') }
+    end
   end
 
   describe '#stats' do

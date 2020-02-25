@@ -14,14 +14,14 @@ module MovieIndustry
         @config.halls[name] = h
       end
 
-      def period(period, &block)
-        p = Period.new(period, &block)
+      def period(key, &block)
+        p = Period.new(key, &block)
 
         @config.periods.values.each do |i|
           raise "Period '#{i.description}' conflicts with '#{p.description}'" if i.intersect?(p)
         end
 
-        @config.periods[period] = p
+        @config.periods[key] = p
       end
     end
   end

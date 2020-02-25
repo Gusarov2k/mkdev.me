@@ -103,3 +103,39 @@ puts "\n# Now client1: #{netflix1.client_balance.format}"
 puts "\n# Now client2: #{netflix2.client_balance.format}"
 puts "\n# Now client3: #{netflix3.client_balance.format}"
 puts "\n# And finaly Netflix balanse is #{MovieIndustry::Netflix.cash.format}"
+
+puts "\n Work with Theatre DSL"
+theatre = MovieIndustry::Theatre.new do
+  hall :red, title: 'Красный зал', places: 100
+  hall :blue, title: 'Синий зал', places: 50
+  hall :green, title: 'Зелёный зал (deluxe)', places: 12
+
+  period '09:00'..'11:00' do
+    description 'Утренний сеанс'
+    filters genre: 'Comedy', year: 1900..1980
+    price 10
+    hall :red, :blue
+  end
+
+  period '11:00'..'16:00' do
+    description 'Спецпоказ'
+    title 'The Terminator'
+    price 50
+    hall :green
+  end
+
+  period '16:00'..'20:00' do
+    description 'Вечерний сеанс'
+    filters genre: %w[Action Drama], year: 2007..Time.now.year
+    price 20
+    hall :red, :blue
+  end
+
+  period '19:00'..'22:00' do
+    description 'Вечерний сеанс для киноманов'
+    filters year: 1900..1945, exclude_country: 'USA'
+    price 30
+    hall :green
+  end
+end
+theatre.show

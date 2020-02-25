@@ -4,8 +4,8 @@ module MovieIndustry
       PERIOD_PARAMS = %i[description filters title price hall].freeze
       attr_reader :range
 
-      def initialize(period, &block)
-        @range = Range.new(*period.minmax.map { |e| Time.parse(e) })
+      def initialize(key, &block)
+        @range = Range.new(*key.minmax.map { |e| Time.parse(e) })
         instance_eval(&block) if block_given?
       end
 

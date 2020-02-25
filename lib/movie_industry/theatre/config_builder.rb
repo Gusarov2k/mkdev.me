@@ -5,7 +5,8 @@ module MovieIndustry
 
       def initialize(&block)
         @config = Config.new
-        instance_eval(&block) if block_given?
+        rules = block_given? ? block : DefaultRules.call
+        instance_eval(&rules)
       end
 
       def hall(name, **params)

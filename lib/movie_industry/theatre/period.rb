@@ -30,7 +30,17 @@ module MovieIndustry
       end
 
       def to_s
-        "#{description}: filters #{filters}, title: #{title}"
+        "#{description}: filters #{glue_up_filters}"
+      end
+
+      def matche_movie?(movie)
+        result = glue_up_filters.inject(movie) { |acc, (k, v)| acc&.matches?(k, v) ? acc : nil }
+        !result.nil?
+      end
+
+      def glue_up_filters
+        filters = @filters || {}
+        instance_variable_defined?(:@title) ? filters.merge(title: title) : filters
       end
 
       private
@@ -39,6 +49,7 @@ module MovieIndustry
         case meth
         when :hall then args
         when :filters then format_filter(args)
+        when :price then Money.new(args.first * 100, 'USD')
         else args.first
         end
       end

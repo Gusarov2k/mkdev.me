@@ -9,9 +9,9 @@ module MovieIndustry
       @config = ConfigBuilder.new(&block).config
     end
 
-    def show
+    def show(hall: nil)
       time = Time.now
-      @curent_period = config.period_by_time(time)
+      @curent_period = config.choose_period(time: time, hall: hall)
       return puts 'Sory, Theatre is closed now.' unless @curent_period
 
       puts prepare_movie(time)
@@ -31,6 +31,11 @@ module MovieIndustry
       enroll(price)
     end
 
+    def what?(time = Time.now)
+      periods = config.select_periods(time: time)
+      periods.each { |p| puts p }
+    end
+
     private
 
     def prepare_movie(time)
@@ -40,7 +45,7 @@ module MovieIndustry
     end
 
     def choose_movie
-      movie_collection.filter(@curent_period.glue_up_filters).sample
+      movie_collection.filter(@curent_period.filters).sample
     end
 
     def movie_period_by_title(title)

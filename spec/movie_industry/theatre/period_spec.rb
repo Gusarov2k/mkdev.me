@@ -42,10 +42,10 @@ RSpec.describe MovieIndustry::Theatre::Period do
     end.config
   end
 
-  let(:period_1) { config_1.periods.values.first }
-  let(:period_2) { config_1.periods.values.last }
-  let(:period_3) { config_2.periods.values.first }
-  let(:period_4) { config_2.periods.values.last }
+  let(:period_1) { config_1.periods.first }
+  let(:period_2) { config_1.periods.last }
+  let(:period_3) { config_2.periods.first }
+  let(:period_4) { config_2.periods.last }
 
   describe '.new' do
     it { expect(period_1.price).to eq Money.new(1000, 'USD') }
@@ -84,9 +84,9 @@ RSpec.describe MovieIndustry::Theatre::Period do
     # rubocop:enable RSpec/PredicateMatcher
   end
 
-  describe 'glue_up_filters' do
-    it { expect(period_1.glue_up_filters).to include(genre: /Action|Drama/, year: 1900..1980, title: 'The Movie') }
-    it { expect(period_2.filters).to include(genre: /Drama/) }
-    it { expect(period_3.glue_up_filters).to include(title: 'The Movie') }
+  describe '#to_s' do
+    it { expect(period_1.to_s).to eq "Period: 'Утренний сеанс' showing Genre: Action or Drama, Year: 1900-1980, Title: 'The Movie'" }
+    it { expect(period_2.to_s).to eq "Period: 'НЕ Утренний сеанс' showing Genre: Drama" }
+    it { expect(period_3.to_s).to eq "Period: 'Утренний сеанс2' showing Title: 'The Movie'" }
   end
 end

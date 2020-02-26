@@ -5,15 +5,24 @@ module MovieIndustry
 
       def initialize
         @halls = {}
-        @periods = {}
+        @periods = []
       end
 
-      def period_by_time(time)
-        @periods.values.select { |p| p.include?(time) }.sample
+      def choose_period(time:, hall: nil)
+        periods = @periods.select { |p| p.include?(time) }
+        hall ? periods.detect { |p| p.hall.include?(hall) } : periods.sample
+      end
+
+      def select_periods(time:)
+        @periods.select { |p| p.include?(time) }
       end
 
       def find_movie_period(movie)
-        periods.values.detect { |p| p.matche_movie?(movie) }
+        periods.detect { |p| p.matche_movie?(movie) }
+      end
+
+      def existing_halls
+        @halls.values.map(&:code)
       end
     end
   end

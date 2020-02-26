@@ -26,6 +26,19 @@ RSpec.describe MovieIndustry::ByCountry do
   end
 
   context 'when country not exists' do
-    it { expect { testing_obj.katmandu }.to raise_error(NoMethodError) }
+    it { expect(testing_obj.nepal).to eq [] }
+  end
+
+  context 'when call with prohibited symbols in method name' do
+    it { expect { testing_obj.nepal? }.to raise_error(NoMethodError) }
+    it { expect { testing_obj.nepal! }.to raise_error(NoMethodError) }
+    it { expect { testing_obj.nepal = 2 }.to raise_error(NoMethodError) }
+  end
+
+  context 'when call with args or block' do
+    let(:msg) { "Country filter can't be called with args or block" }
+
+    it { expect { testing_obj.nepal(true) }.to raise_error(ArgumentError, msg) }
+    it { expect { testing_obj.nepal { puts 'vava la nepal' } }.to raise_error(ArgumentError, msg) }
   end
 end

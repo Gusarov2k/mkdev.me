@@ -5,20 +5,20 @@ module MovieIndustry
     end
 
     def method_missing(method, *args, &block)
-      movies = filter_by_country(method)
-      return movies if movies.any?
+      return super if prohibited_country_name?(method)
+      raise(ArgumentError, "Country filter can't be called with args or block") if block || args.any?
 
-      super
+      @movie_collection.filter(country: sym_to_filter(method))
     end
 
     def respond_to_missing?(method, *)
-      filter_by_country(method).any? || super
+      !prohibited_country_name?(method) || super
     end
 
     private
 
-    def filter_by_country(sym)
-      @movie_collection.filter(country: sym_to_filter(sym))
+    def prohibited_country_name?(method)
+      method.to_s =~ /\?|\!|=/
     end
 
     def sym_to_filter(sym)

@@ -15,7 +15,6 @@ module MovieIndustry
       @movie_collection = movie_collection
       @client_balance = client_balance
       @user_filters = {}
-      self.class.create_methods(:by_genre, :by_country)
     end
 
     def pay(amount)
@@ -51,12 +50,12 @@ module MovieIndustry
       @user_filters[name] = proc { |m| parent_filter.call(m, arg) }
     end
 
-    def self.create_methods(*names)
-      names.each do |name|
-        define_method name do
-          MovieIndustry::MovieArray.new(@movie_collection.all, @movie_collection.existing_genres)
-        end
-      end
+    def by_genre
+      ByGenre.new(@movie_collection)
+    end
+
+    def by_country
+      ByCountry.new(@movie_collection)
     end
 
     private

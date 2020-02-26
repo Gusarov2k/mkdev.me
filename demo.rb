@@ -12,6 +12,8 @@ Dir['./lib/**/*.rb'].sort.each { |file| require file }
 
 file_name = ARGV.first || 'movies.txt'
 movies = MovieIndustry::MovieCollection.new(file_name)
+netflix = MovieIndustry::Netflix.new(movies)
+netflix.by_country.usa
 
 puts '# 5 movies with maximum duration selecting with symbol'
 puts movies.sort_by(:duration).last(5)

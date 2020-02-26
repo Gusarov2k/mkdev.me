@@ -20,16 +20,43 @@ RSpec.describe MovieIndustry::Theatre::Config do
     end.config
   end
 
-  describe '#period_by_time' do
-    subject(:period_by_time) { config.period_by_time(Time.parse('9:01')) }
+  describe '#choose_period' do
+    subject(:choose_period) { config.choose_period(time: Time.parse('9:01')) }
 
     context 'when period exists' do
-      it { expect(period_by_time).to be_an_instance_of(MovieIndustry::Theatre::Period) }
-      it { expect(period_by_time.description).to eq 'Утренний сеанс' }
+      it { expect(choose_period).to be_an_instance_of(MovieIndustry::Theatre::Period) }
+      it { expect(choose_period.description).to eq 'Утренний сеанс' }
     end
 
     context 'when period not exists' do
-      it { expect(config.period_by_time(Time.parse('11:01'))).to be_nil }
+      it { expect(config.choose_period(time: Time.parse('11:01'))).to be_nil }
+    end
+
+    context 'when filtering by hall' do
+      let(:config) do
+        MovieIndustry::Theatre::ConfigBuilder.new do
+          hall :red, title: 'Красный зал', places: 100
+          hall :blue, title: 'Синий зал', places: 50
+
+          period '09:00'..'11:00' do
+            description 'Комедии в красном зале'
+            filters genre: 'Comedy', year: 1900..1980
+            price 10
+            hall :red
+          end
+
+          period '09:00'..'11:00' do
+            description 'Экшн-Драммы'
+            filters genre: %w[Action Drama], year: 2007..Time.now.year
+            price 20
+            hall :blue
+          end
+        end.config
+      end
+
+      let(:choose_red) { config.choose_period(time: Time.parse('9:01'), hall: :red) }
+
+      it { expect(choose_red.description).to eq 'Комедии в красном зале' }
     end
   end
 
@@ -48,5 +75,9 @@ RSpec.describe MovieIndustry::Theatre::Config do
     context 'when period not exists' do
       it { expect(config.find_movie_period(movie_3)).to be_nil }
     end
+  end
+
+  describe '#existing_halls' do
+    it { expect(config.existing_halls).to include(:red, :blue) }
   end
 end

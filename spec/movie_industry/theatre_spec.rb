@@ -115,6 +115,22 @@ RSpec.describe MovieIndustry::Theatre do
       it { expect { show }.to output(Regexp.union(str1, str2)).to_stdout }
     end
 
+    context 'when call in the morning 19:00-20:00 with red-hall for DSL-config' do
+      subject(:show) { dsl_theatre.show(hall: :red) }
+
+      before { Timecop.freeze(Time.new(2011, 1, 15, 19, 59)) }
+
+      it { expect { show }.to output("Now showing: New Film - new movie, released 3 years ago! 19:59-22:21\n").to_stdout }
+    end
+
+    context 'when call in the morning 19:00-20:00 with green-hall for DSL-config' do
+      subject(:show) { dsl_theatre.show(hall: :green) }
+
+      before { Timecop.freeze(Time.new(2011, 1, 15, 19, 59)) }
+
+      it { expect { show }.to output("Now showing: Ancient Crime - old movie (1932 year) 19:59-22:21\n").to_stdout }
+    end
+
     context 'when call in the morning 20:00-22:00 for DSL-config' do
       subject(:show) { dsl_theatre.show }
 
@@ -141,6 +157,24 @@ RSpec.describe MovieIndustry::Theatre do
     context 'when move exists' do
       it { expect(dsl_theatre.when?('Modern Comedy')).to eq 'Утренний сеанс' }
       it { expect(dsl_theatre.when?('Never Film')).to be_nil }
+    end
+  end
+
+  describe '#what?' do
+    context 'when two movies at same time' do
+      subject(:what) { dsl_theatre.what? }
+
+      before { Timecop.freeze(Time.new(2011, 1, 15, 19, 59)) }
+
+      it { expect { what }.to output("Period: 'Вечерний сеанс' showing Genre: Action or Drama, Year: 2007-2011\nPeriod: 'Вечерний сеанс для киноманов' showing Year: 1900-1945, Exclude country: USA\n").to_stdout }
+    end
+
+    context 'when time given' do
+      subject(:what) { dsl_theatre.what?(Time.new(2011, 1, 15, 9, 59)) }
+
+      before { Timecop.freeze(Time.new(2011, 1, 15, 0, 59)) }
+
+      it { expect { what }.to output("Period: 'Утренний сеанс' showing Genre: Comedy, Year: 1900-1980\n").to_stdout }
     end
   end
 

@@ -1,22 +1,43 @@
 module MovieIndustry
   class Theatre
     class Period
-      PERIOD_PARAMS = %i[description filters title price hall].freeze
       attr_reader :range
 
       def initialize(key, &block)
         @range = Range.new(*key.minmax.map { |e| Time.parse(e) })
+        @description = nil
+        @filters = {}
+        @price = nil
+        @hall = []
         instance_eval(&block) if block_given?
       end
 
-      def method_missing(meth, *args, &block)
-        return super unless PERIOD_PARAMS.include?(meth)
+      def description(arg = nil)
+        return @description unless arg
 
-        args.empty? ? instance_variable_get("@#{meth}") : instance_variable_set("@#{meth}", format_by(meth, args))
+        @description = arg
       end
 
-      def respond_to_missing?(method, *)
-        PERIOD_PARAMS.include?(method) || super
+      def filters(arg = nil)
+        return @filters unless arg
+
+        @filters = format_filter(arg)
+      end
+
+      def title(arg)
+        @filters = @filters.merge(title: arg)
+      end
+
+      def price(arg = nil)
+        return @price unless arg
+
+        @price = Money.new(arg * 100, 'USD')
+      end
+
+      def hall(*args)
+        return @hall unless args.any?
+
+        @hall = args
       end
 
       def intersect?(period)
@@ -30,32 +51,29 @@ module MovieIndustry
       end
 
       def to_s
-        "#{description}: filters #{glue_up_filters}"
+        "Period: '#{description}' showing #{print_filtres}"
       end
 
       def matche_movie?(movie)
-        result = glue_up_filters.inject(movie) { |acc, (k, v)| acc&.matches?(k, v) ? acc : nil }
+        result = @filters.inject(movie) { |acc, (k, v)| acc&.matches?(k, v) ? acc : nil }
         !result.nil?
-      end
-
-      def glue_up_filters
-        filters = @filters || {}
-        instance_variable_defined?(:@title) ? filters.merge(title: title) : filters
       end
 
       private
 
-      def format_by(meth, args)
-        case meth
-        when :hall then args
-        when :filters then format_filter(args)
-        when :price then Money.new(args.first * 100, 'USD')
-        else args.first
+      def print_filtres
+        msg = filters.map do |key, val|
+          case key
+          when :genre then "Genre: #{val.source.gsub('|', ' or ')}"
+          when :year then "Year: #{val.minmax.join('-')}"
+          when :title then "Title: '#{val}'"
+          when :exclude_country then "Exclude country: #{val}"
+          end
         end
+        msg.join(', ')
       end
 
-      def format_filter(args)
-        filter = args.first
+      def format_filter(filter)
         if filter[:genre].is_a?(String)
           filter[:genre] = Regexp.new(filter[:genre])
         elsif filter[:genre].is_a?(Array)
